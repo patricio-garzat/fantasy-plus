@@ -1497,6 +1497,80 @@ html:not([data-theme="light"]) .mv-pg.live, html:not([data-theme="light"]) .mv-p
 html:not([data-theme="light"]) .role-tag.up { color: #6EE7B7; background: rgba(52,211,153,.12); }
 html:not([data-theme="light"]) .role-tag.down { color: #FCA5A5; background: rgba(248,113,113,.12); }
 
+/* Depth charts */
+.dc-search { margin-bottom: 12px; }
+.dc-input { width: 100%; height: 48px; padding: 0 16px 0 42px; font: inherit; font-size: 15px; color: var(--text); background: var(--surface) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none' stroke='%237C7C88' stroke-width='1.8' stroke-linecap='round'%3E%3Ccircle cx='9' cy='9' r='6'/%3E%3Cpath d='M13.5 13.5L17 17'/%3E%3C/svg%3E") no-repeat 14px center / 18px; border: 1px solid var(--border); border-radius: 12px; transition: border-color .15s ease, box-shadow .15s ease; }
+.dc-input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 4px var(--accent-soft); }
+.dc-sug-logo { width: 26px; height: 26px; object-fit: contain; flex: none; }
+.dc-teams { display: grid; grid-template-columns: repeat(auto-fill, minmax(58px, 1fr)); gap: 6px; margin-bottom: 16px; }
+.dc-tb { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 6px 2px; border: 1px solid var(--border); border-radius: 10px; background: var(--surface); color: var(--text-2); font: inherit; font-size: 11px; font-weight: 700; cursor: pointer; transition: border-color .15s ease, background-color .15s ease, transform .12s ease; }
+.dc-tb img { width: 30px; height: 30px; object-fit: contain; }
+.dc-tb:hover { border-color: var(--accent); }
+.dc-tb:active { transform: scale(.96); }
+.dc-tb[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-soft); color: var(--text); box-shadow: 0 0 0 1px var(--accent) inset; }
+.dc-tb:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.dc-top { display: flex; align-items: center; gap: 16px; padding: 16px 18px; margin-bottom: 14px; }
+.dc-logo { width: 56px; height: 56px; object-fit: contain; flex: none; }
+.dc-tid { min-width: 0; flex: 1; }
+.dc-tid h3 { font-size: 20px; font-weight: 800; letter-spacing: -.01em; }
+.dc-tid p { font-size: 13px; color: var(--muted); }
+.dc-live { display: flex; align-items: center; gap: 6px; margin-top: 2px; }
+.dc-live .ldot { width: 7px; height: 7px; border-radius: 50%; background: #34D399; box-shadow: 0 0 0 3px rgba(52,211,153,.18); }
+.dc-actions { display: flex; align-items: center; gap: 10px; flex: none; }
+.dc-refresh { width: 40px; height: 40px; padding: 0; font-size: 18px; }
+.dc-refresh.is-refreshing { animation: spin .8s linear infinite; }
+.dc-ext { font-size: 13px; font-weight: 600; color: var(--accent); text-decoration: none; }
+.dc-ext:hover { text-decoration: underline; }
+.dc-grid { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 14px; align-items: start; }
+.dc-card { padding: 14px 16px 8px; min-width: 0; }
+.dc-card.dc-wide { grid-column: 1 / -1; }
+.dc-h { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+.dc-h h3 { font-size: 15px; font-weight: 700; }
+.dc-wr { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 0 18px; }
+.dc-wrcol { min-width: 0; }
+.dc-wrl { margin: 4px 0 2px; font-size: 11px; font-weight: 700; letter-spacing: .06em; color: var(--muted); }
+.dc-row { display: grid; grid-template-columns: 22px 34px minmax(0,1fr); grid-template-areas: "n av main" ". . own"; align-items: center; gap: 2px 10px; padding: 10px 0; border-top: 1px solid var(--border-2); border-radius: 8px; transition: background-color .3s ease; }
+.dc-row:first-of-type, .dc-wrl + .dc-row { border-top: 0; }
+.dc-n { grid-area: n; width: 22px; height: 22px; border-radius: 7px; display: inline-flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 800; color: var(--muted); background: var(--neutral-bg); }
+.dc-row.first .dc-n { color: #fff; background: var(--accent); }
+.dc-row .avatar { grid-area: av; }
+.dc-main { grid-area: main; min-width: 0; display: flex; flex-direction: column; gap: 1px; }
+.dc-name { display: flex; align-items: center; flex-wrap: wrap; gap: 4px 6px; font-weight: 600; font-size: 14px; min-width: 0; }
+.dc-name .pl-link { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 100%; }
+.dc-sub { font-size: 12px; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.dc-row.is-out .dc-name > .pl-link, .dc-row.is-out .dc-name { color: var(--muted); }
+.dc-row.hl { background: var(--accent-soft); box-shadow: 0 0 0 6px var(--accent-soft); }
+.dc-own { grid-area: own; justify-self: start; display: inline-flex; align-items: center; gap: 6px; max-width: 100%; min-width: 0; margin-top: 4px; font-size: 12px; }
+.dc-own .avatar { width: 18px; height: 18px; font-size: 8px; flex: none; }
+.dc-own span:last-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.dc-taken { color: var(--muted); }
+.dc-you { height: 22px; padding: 0 8px; border-radius: 6px; font-weight: 700; color: var(--accent); background: var(--accent-soft); }
+.dc-fa { height: 26px; padding: 0 10px; border: 0; border-radius: 7px; font: inherit; font-size: 12px; font-weight: 700; color: var(--good); background: var(--good-bg); cursor: pointer; transition: filter .15s ease; }
+.dc-fa:hover { filter: brightness(1.08); }
+.dc-fa:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.dc-empty { padding: 10px 0 14px; font-size: 13px; color: var(--muted); }
+.dc-note { margin-top: 14px; font-size: 12px; color: var(--muted); }
+@media (max-width: 860px) {
+  .dc-wr { grid-template-columns: minmax(0,1fr); }
+  .dc-wrl { margin-top: 10px; }
+}
+@media (max-width: 640px) {
+  .dc-teams { display: flex; overflow-x: auto; margin: 0 -16px 14px; padding: 2px 16px 6px; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+  .dc-teams::-webkit-scrollbar { display: none; }
+  .dc-tb { flex: none; width: 58px; }
+  .dc-grid { grid-template-columns: minmax(0,1fr); }
+  .dc-top { padding: 14px; gap: 12px; }
+  .dc-logo { width: 44px; height: 44px; }
+  .dc-tid h3 { font-size: 17px; }
+  .dc-actions { flex-direction: column; gap: 4px; }
+}
+html:not([data-theme="light"]) .dc-tb { background: var(--surface); border-color: var(--border); }
+html:not([data-theme="light"]) .dc-tb[aria-pressed="true"] { background: rgba(99,102,241,.18); }
+html:not([data-theme="light"]) .dc-input { background-color: var(--surface-2); }
+html:not([data-theme="light"]) .dc-fa { color: #6EE7B7; background: rgba(52,211,153,.12); }
+html:not([data-theme="light"]) .dc-you { color: #C7CCFF; background: rgba(129,140,248,.16); }
+html:not([data-theme="light"]) .dc-row.hl { background: rgba(99,102,241,.16); box-shadow: 0 0 0 6px rgba(99,102,241,.16); }
+
 /* League players */
 .pl-filters { padding: 16px 18px; }
 .pl-pos { gap: 6px; }
@@ -2352,6 +2426,73 @@ async function getEspnOverview(espnId) {
   return data;
 }
 
+/* ---- NFL depth charts (ESPN, updated by ESPN through the day) ---- */
+// NFL teams with ESPN ids (ESPN's team list isn't readable from the browser; ids never change).
+const NFL_TEAMS = [
+  ['ARI', '22', 'Arizona', 'Cardinals'],
+  ['ATL', '1', 'Atlanta', 'Falcons'],
+  ['BAL', '33', 'Baltimore', 'Ravens'],
+  ['BUF', '2', 'Buffalo', 'Bills'],
+  ['CAR', '29', 'Carolina', 'Panthers'],
+  ['CHI', '3', 'Chicago', 'Bears'],
+  ['CIN', '4', 'Cincinnati', 'Bengals'],
+  ['CLE', '5', 'Cleveland', 'Browns'],
+  ['DAL', '6', 'Dallas', 'Cowboys'],
+  ['DEN', '7', 'Denver', 'Broncos'],
+  ['DET', '8', 'Detroit', 'Lions'],
+  ['GB', '9', 'Green Bay', 'Packers'],
+  ['HOU', '34', 'Houston', 'Texans'],
+  ['IND', '11', 'Indianapolis', 'Colts'],
+  ['JAX', '30', 'Jacksonville', 'Jaguars'],
+  ['KC', '12', 'Kansas City', 'Chiefs'],
+  ['LAC', '24', 'Los Angeles', 'Chargers'],
+  ['LAR', '14', 'Los Angeles', 'Rams'],
+  ['LV', '13', 'Las Vegas', 'Raiders'],
+  ['MIA', '15', 'Miami', 'Dolphins'],
+  ['MIN', '16', 'Minnesota', 'Vikings'],
+  ['NE', '17', 'New England', 'Patriots'],
+  ['NO', '18', 'New Orleans', 'Saints'],
+  ['NYG', '19', 'New York', 'Giants'],
+  ['NYJ', '20', 'New York', 'Jets'],
+  ['PHI', '21', 'Philadelphia', 'Eagles'],
+  ['PIT', '23', 'Pittsburgh', 'Steelers'],
+  ['SEA', '26', 'Seattle', 'Seahawks'],
+  ['SF', '25', 'San Francisco', '49ers'],
+  ['TB', '27', 'Tampa Bay', 'Buccaneers'],
+  ['TEN', '10', 'Tennessee', 'Titans'],
+  ['WAS', '28', 'Washington', 'Commanders'],
+];
+let nflTeamCache = null;
+const nflTeamList = () => (nflTeamCache ||= NFL_TEAMS.map(([abbr, espnId, city, nick]) => ({ abbr, espnId, city, nick, name: `${city} ${nick}` })));
+
+const DC_INJ = { Q: 'Questionable', D: 'Doubtful', O: 'Out', IR: 'IR', PUP: 'PUP', SUSP: 'Sus', S: 'Sus' };
+/** One team's offensive depth chart: QB, RB, TE and the three WR spots, in order, with injuries. */
+async function getDepthChart(espnTeamId, maxAgeMs = 60e3) {
+  const key = `dc:${espnTeamId}`;
+  const hit = memo.playerStats.get(key);
+  if (hit && Date.now() - hit.ts < maxAgeMs) return hit.data;
+  const d = await httpGet(`https://site.web.api.espn.com/apis/site/v2/sports/football/nfl/teams/${encodeURIComponent(espnTeamId)}/depthcharts`, { fresh: true });
+  const groups = d?.depthchart || [];
+  const off = groups.find(g => g.positions?.qb) || groups.find(g => g.positions?.wr1) || null;
+  const list = k => (off?.positions?.[k]?.athletes || []).map((a, i) => {
+    const inj = (a.injuries || [])[0] || null;
+    const ab = inj?.type?.abbreviation || '';
+    return {
+      espnId: String(a.id), name: a.displayName || a.fullName || '', depth: a.slot || i + 1,
+      inj: inj ? DC_INJ[ab] || inj.status || null : null,
+      injNote: inj ? inj.shortComment || '' : '', injDate: inj?.date || null,
+    };
+  });
+  const t = d?.team || {};
+  const data = {
+    fetchedAt: Date.now(), stamp: d?.timestamp || null, formation: off?.name || '',
+    team: { espnId: String(t.id || espnTeamId), abbr: ESPN_TEAM[t.abbreviation] || t.abbreviation || '', name: t.displayName || '', record: t.recordSummary || '', standing: t.standingSummary || '', color: t.color || null },
+    QB: list('qb'), RB: list('rb'), TE: list('te'), WR: [list('wr1'), list('wr2'), list('wr3')], FB: list('fb'),
+  };
+  memo.playerStats.set(key, { ts: Date.now(), data });
+  return data;
+}
+
 /* ---- Player news → role signal (ESPN / RotoWire notes, read with simple phrase rules) ---- */
 const newsStore = new Map();   // pid -> { ts, a: analysis | null }
 const newsInflight = new Map();
@@ -2886,6 +3027,14 @@ function buildViewModel(raw, myRosterId) {
       if (pts) { h.total += pts; h.games++; }
     }
   }
+  /** Points per game this season for any player, rostered or not (league scoring). */
+  const ppgAny = pid => {
+    const h = hist[pid];
+    if (h && h.games) return h.total / h.games;
+    let t = 0, g = 0;
+    for (const w of timeline.completed) { const e = statsAt(w)?.[pid]; if (e && e.gp) { t += sp(e) || 0; g++; } }
+    return g ? t / g : null;
+  };
   const valueCache = new Map();
   const valueOf = pid => {
     if (valueCache.has(pid)) return valueCache.get(pid);
@@ -3921,7 +4070,7 @@ function buildViewModel(raw, myRosterId) {
   const myOppId = myMatch ? oppOf(currentMatchups, myMatch)?.roster_id ?? null : null;
 
   return {
-    rosterOf, myOppId, liveStat, rosteredPlayers, newsOf, opportunityOf, adjValue, liveGameOf: team => liveGames?.[team] || null, seasonStatsMissing, scoreStats,
+    rosterOf, myOppId, liveStat, rosteredPlayers, ppgAny, newsOf, opportunityOf, adjValue, liveGameOf: team => liveGames?.[team] || null, seasonStatsMissing, scoreStats,
     league, state, timeline, teams, me, N, cfg, ptsKey, leagueRows, lineup, posPoints, meRow,
     liveStandings, playoffTeams: league.settings?.playoff_teams || null, matchupWeeks, buildMatchups,
     searchPlayers, startSitDefault, allowRank, statWeeksUsed: statWeeks, usageOf, lineFor, lines: lines || {},
@@ -4019,6 +4168,8 @@ const ui = {
   nflWeek: null,
   nflOpen: new Set(),
   nflErr: new Map(),
+  wvView: 'wire',
+  dc: { team: null, q: '', hl: null, err: null },
   pl: { pos: 'All', week: null, min: 0, owner: 'all', q: '', sort: 'pts' },
   muOpen: new Set(),
   muOpenInit: false,
@@ -4980,13 +5131,17 @@ function renderTeamStats(vm) {
 /* ---------- Waivers ---------- */
 const OPP_LEVEL = { High: 3, Medium: 2, Low: 1 };
 
+const wvModes = () => `<div class="stand-modes mu-modes" role="group" aria-label="Waivers view">${[['wire', 'Waiver wire'], ['depth', 'Depth charts']]
+  .map(([k, l]) => `<button type="button" class="smode${ui.wvView === k ? ' on' : ''}" data-wvview="${k}" aria-pressed="${ui.wvView === k}">${l}</button>`).join('')}</div>`;
+
 function renderWaivers(vm) {
+  if (ui.wvView === 'depth') { renderDepthCharts(vm); return; }
   const order = ['RB', 'WR', 'TE', 'QB'];
   const positions = ['All', ...order.filter(pos => vm.waivers.some(w => w.pos === pos))];
   if (!positions.includes(ui.waiverFilter)) ui.waiverFilter = 'All';
   const chips = positions.map(pos => `<button type="button" class="chip" data-filter="${pos}" aria-pressed="${pos === ui.waiverFilter}">${pos}</button>`).join('');
 
-  $('#panel-waivers').innerHTML = `
+  $('#panel-waivers').innerHTML = `${wvModes()}
     <section class="card card-pad eval-card reveal" id="evalBox" aria-labelledby="evalTitle"></section>
     <div class="section-head section-gap">
       <div>
@@ -4999,6 +5154,175 @@ function renderWaivers(vm) {
   renderEvaluator(vm);
   renderWaiverList(vm);
 }
+
+/* ---------- NFL depth charts: who's 1, 2, 3 on every team, and who's free in your league ---------- */
+const DC_OUT = inj => ['Out', 'IR', 'PUP', 'Sus', 'Doubtful'].includes(inj);
+const dcKey = 'fa_dc_team';
+
+/** Sleeper player id for a depth-chart entry: ESPN id first, then by name (with team as tiebreaker). */
+function dcPid(a, team) {
+  const byId = pidForEspn(a.espnId);
+  if (byId) return byId;
+  const nm = a.name.replace(/\s+(Jr\.?|Sr\.?|II|III|IV|V)$/i, '').toLowerCase();
+  const names = newsNames();
+  const hit = names.full.get(a.name.toLowerCase()) || names.full.get(nm);
+  if (hit && (!hit.t || hit.t === team)) return hit.pid;
+  const mates = names.byTeam.get(team);
+  const lastN = nm.split(' ').pop();
+  const m = mates?.get(lastN);
+  return m && ui.raw?.players?.[m.pid]?.n?.toLowerCase().startsWith(nm.split(' ')[0].slice(0, 2)) ? m.pid : null;
+}
+
+function renderDepthCharts(vm) {
+  const panel = $('#panel-waivers');
+  panel.innerHTML = `${wvModes()}
+    <div class="section-head">
+      <div><h2>Depth Charts</h2><p>Who's 1, 2 and 3 at QB, RB, WR and TE on every NFL team, live from ESPN, and who's still available in your league.</p></div>
+    </div>
+    <div class="dc-search combo">
+      <input type="search" id="dcQ" class="dc-input" placeholder="Team or player: 49ers, KC, Puka…" autocomplete="off" aria-label="Search a team or player" aria-controls="dcSug" value="${esc(ui.dc.q)}">
+      <ul class="combo-list" id="dcSug" role="listbox" hidden></ul>
+    </div>
+    <div class="dc-teams" id="dcTeams" role="group" aria-label="NFL teams"></div>
+    <div id="dcBody"></div>`;
+  const teams = nflTeamList();
+  if (!ui.dc.team || !teams.some(t => t.abbr === ui.dc.team)) {
+    const saved = store.get(dcKey);
+    const myQB = vm.lineup.find(l => l.player?.pos === 'QB')?.player?.team;
+    ui.dc.team = [saved, myQB].find(x => x && teams.some(t => t.abbr === x)) || teams[0].abbr;
+  }
+  $('#dcTeams').innerHTML = teams.map(t => `<button type="button" class="dc-tb" data-dcteam="${esc(t.abbr)}" aria-pressed="${t.abbr === ui.dc.team}" title="${esc(t.name)}">
+      <img src="${photoUrl(t.abbr, 'DEF')}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.style.visibility='hidden'"><span>${esc(t.abbr)}</span></button>`).join('');
+  const sel = $('#dcTeams .dc-tb[aria-pressed="true"]');
+  if (sel && mqPhone.matches) { const box = $('#dcTeams'); box.scrollLeft = sel.offsetLeft - box.clientWidth / 2 + sel.offsetWidth / 2; }
+  renderDcBody(vm);
+}
+
+function dcLoad(team, maxAge) {
+  const teams = nflTeamList();
+  const t = teams.find(x => x.abbr === team);
+  if (!t) return Promise.resolve(null);
+  ui.dc.err = null;
+  return getDepthChart(t.espnId, maxAge).catch(err => { ui.dc.err = friendlyError(err); return null; });
+}
+
+function renderDcBody(vm, { fromTick = false } = {}) {
+  const body = $('#dcBody');
+  if (!body) return;
+  const team = ui.dc.team;
+  const teams = nflTeamList();
+  const t = teams.find(x => x.abbr === team);
+  const hit = t ? memo.playerStats.get(`dc:${t.espnId}`) : null;
+  if (!hit || Date.now() - hit.ts > 60e3) {
+    if (!hit) body.innerHTML = ui.dc.err
+      ? `<div class="card notice"><strong>Couldn’t load this depth chart</strong>${esc(ui.dc.err)}<div style="margin-top:12px"><button type="button" class="btn btn-ghost" data-dcrefresh="1">Try again</button></div></div>`
+      : `<div class="dc-grid">${Array.from({ length: 4 }, () => '<div class="card ng-skel"><span></span><span></span><span></span></div>').join('')}</div>`;
+    if (!ui.dc.loading) {
+      ui.dc.loading = true;
+      dcLoad(team, 60e3).finally(() => { ui.dc.loading = false; if (ui.vm && ui.dc.team === team && $('#dcBody')) renderDcBody(ui.vm); });
+    }
+    if (!hit) return;
+  }
+  const dc = hit.data;
+  const ownerLine = (pid) => {
+    if (!pid) return '<span class="dc-own muted">Not in Sleeper’s list</span>';
+    const owner = vm.ownerOf(pid);
+    if (!owner) return `<button type="button" class="dc-own dc-fa" data-dcadd="${esc(pid)}">Free agent · Evaluate add</button>`;
+    if (owner.rosterId === vm.me.rosterId) return '<span class="dc-own dc-you">Your team</span>';
+    return `<span class="dc-own dc-taken">${avatarHtml(owner.avatar, owner.name)}<span>${esc(owner.name)}</span></span>`;
+  };
+  const avatar = (pid, a, pos) => pid ? playerAvatar(pid, a.name, pos, 'sm')
+    : `<span class="avatar ph sm" aria-hidden="true"><span class="ph-ini">${esc(initials(a.name))}</span><img src="https://a.espncdn.com/combiner/i?img=/i/headshots/nfl/players/full/${esc(a.espnId)}.png&w=96&h=70&cb=1" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()"></span>`;
+  const rows = (list, pos, max = 4) => list.slice(0, max).map((a, i) => {
+    const pid = dcPid(a, dc.team.abbr);
+    const ppg = pid ? vm.ppgAny(pid) : null;
+    const before = list.slice(0, i);
+    const nextUp = i > 0 && !DC_OUT(a.inj) && before.every(x => DC_OUT(x.inj));
+    const out = DC_OUT(a.inj);
+    return `<div class="dc-row ${i === 0 ? 'first' : ''} ${out ? 'is-out' : ''} ${pid && pid === ui.dc.hl ? 'hl' : ''}" ${pid ? `data-dcpid="${esc(pid)}"` : ''}>
+      <span class="dc-n">${i + 1}</span>
+      ${avatar(pid, a, pos)}
+      <span class="dc-main">
+        <span class="dc-name">${pid ? plink(pid, a.name) : esc(a.name)} ${a.inj ? injTag(a.inj) : ''}${nextUp ? '<span class="role-tag up">▲ Next up</span>' : ''}</span>
+        <span class="dc-sub">${ppg != null ? `${f1(ppg)} ppg` : 'No fantasy pts yet'}${a.inj && a.injNote ? ` · <span title="${esc(a.injNote)}">${esc(a.injNote.length > 70 ? a.injNote.slice(0, 67) + '…' : a.injNote)}</span>` : ''}</span>
+      </span>
+      ${ownerLine(pid)}
+    </div>`;
+  }).join('') || '<p class="dc-empty">No players listed.</p>';
+  const card = (pos, inner, cls = '') => `<section class="card dc-card ${cls}"><header class="dc-h">${posTag(pos)}<h3>${{ QB: 'Quarterback', RB: 'Running back', WR: 'Wide receiver', TE: 'Tight end' }[pos]}</h3></header>${inner}</section>`;
+  const age = Math.max(0, Math.round((Date.now() - hit.ts) / 1000));
+  body.innerHTML = `
+    <section class="card dc-top">
+      <img class="dc-logo" src="${photoUrl(dc.team.abbr, 'DEF')}" alt="" referrerpolicy="no-referrer">
+      <div class="dc-tid">
+        <h3>${esc(dc.team.name)}</h3>
+        <p>${esc([dc.team.record, dc.team.standing].filter(Boolean).join(' · '))}</p>
+        <p class="dc-live"><span class="ldot"></span><span>Live from ESPN · <span id="dcAge">updated ${age < 5 ? 'just now' : `${age}s ago`}</span></span></p>
+      </div>
+      <div class="dc-actions">
+        <button type="button" class="btn btn-ghost dc-refresh" data-dcrefresh="1" aria-label="Refresh depth chart">↻</button>
+        <a class="dc-ext" href="https://www.espn.com/nfl/team/depth/_/name/${esc(String(dc.team.abbr === 'WAS' ? 'wsh' : dc.team.abbr).toLowerCase())}" target="_blank" rel="noopener">ESPN ↗</a>
+      </div>
+    </section>
+    <div class="dc-grid">
+      ${card('QB', rows(dc.QB, 'QB', 3))}
+      ${card('RB', rows(dc.RB, 'RB', 4))}
+      ${card('WR', `<div class="dc-wr">${dc.WR.map((l, k) => `<div class="dc-wrcol"><div class="dc-wrl">WR${k + 1}</div>${rows(l, 'WR', 3)}</div>`).join('')}</div>`, 'dc-wide')}
+      ${card('TE', rows(dc.TE, 'TE', 3))}
+    </div>
+    <p class="dc-note">Order and injuries come from ESPN’s depth chart and refresh every minute while you’re here. “Next up” marks the first healthy player behind an injured starter. Free-agent status and points are for your league.</p>`;
+  if (!fromTick) flashChanges();
+  if (ui.dc.hl) { const el = body.querySelector(`.dc-row[data-dcpid="${CSS.escape(ui.dc.hl)}"]`); if (el && !fromTick) el.scrollIntoView({ block: 'center', behavior: 'smooth' }); }
+}
+
+/** Search box: teams (name, city, abbreviation) and players (jump to their team). */
+function dcSuggest(q) {
+  const box = $('#dcSug');
+  if (!box) return;
+  const s = q.trim().toLowerCase();
+  if (!s) { box.hidden = true; box.innerHTML = ''; return; }
+  const teams = nflTeamList();
+  const tm = teams.filter(t => [t.abbr, t.name, t.nick, t.city].some(x => String(x).toLowerCase().includes(s))).slice(0, 5)
+    .map(t => ({ kind: 'team', abbr: t.abbr, label: t.name, sub: t.abbr }));
+  const pl = [];
+  if (s.length >= 2) {
+    for (const [pid, p] of Object.entries(ui.raw?.players || {})) {
+      if (!p.t || !['QB', 'RB', 'WR', 'TE'].includes(p.p)) continue;
+      const n = p.n.toLowerCase();
+      if (n.startsWith(s) || n.includes(` ${s}`)) pl.push({ kind: 'player', pid, abbr: p.t, label: p.n, sub: `${p.p} · ${p.t}`, rank: ui.vm?.ppgAny(pid) || 0 });
+    }
+    pl.sort((a, b) => b.rank - a.rank);
+  }
+  const all = [...tm, ...pl.slice(0, 6)];
+  box.innerHTML = all.length ? all.map((x, i) => `<li class="combo-opt ${i === 0 ? 'active' : ''}" role="option" data-dcsug="${esc(x.abbr)}" ${x.pid ? `data-dcsugpid="${esc(x.pid)}"` : ''}>
+      ${x.kind === 'team' ? `<img class="dc-sug-logo" src="${photoUrl(x.abbr, 'DEF')}" alt="">` : playerAvatar(x.pid, x.label, x.sub.slice(0, 2), 'xs')}
+      <span class="co-name">${esc(x.label)}</span><span class="co-team">${esc(x.sub)}</span></li>`).join('')
+    : '<li class="combo-empty">No team or player found.</li>';
+  box.hidden = false;
+}
+
+function dcSelect(abbr, pid = null) {
+  ui.dc.team = abbr;
+  ui.dc.hl = pid;
+  ui.dc.q = '';
+  store.set(dcKey, abbr);
+  if (ui.vm) renderDepthCharts(ui.vm);
+}
+
+// Keep the open depth chart live: re-read it every minute while it's on screen.
+setInterval(() => {
+  if (!ui.vm || ui.tab !== 'waivers' || ui.wvView !== 'depth' || $('#dashboard').hidden || document.visibilityState !== 'visible') return;
+  const team = ui.dc.team;
+  const label = $('#dcAge');
+  const teams = nflTeamList();
+  const t = teams.find(x => x.abbr === team);
+  const hit = t ? memo.playerStats.get(`dc:${t.espnId}`) : null;
+  if (label && hit) { const s = Math.round((Date.now() - hit.ts) / 1000); label.textContent = s < 5 ? 'updated just now' : `updated ${s < 60 ? `${s}s` : `${Math.floor(s / 60)} min`} ago`; }
+  if (hit && Date.now() - hit.ts >= 60e3 && !ui.dc.loading && !(document.activeElement?.id === 'dcQ')) {
+    ui.dc.loading = true;
+    dcLoad(team, 0).finally(() => { ui.dc.loading = false; if (ui.vm && ui.dc.team === team && $('#dcBody')) renderDcBody(ui.vm, { fromTick: true }); flashChanges(); });
+  }
+}, 5000);
 
 /* ---------- Move evaluator ---------- */
 function renderEvaluator(vm) {
@@ -6583,6 +6907,12 @@ $('.tabs').addEventListener('keydown', e => {
   if (next) { e.preventDefault(); setTab(next.dataset.tab, { focus: true }); }
 });
 
+$('main').addEventListener('keydown', e => {
+  if (e.target.id !== 'dcQ') return;
+  if (e.key === 'Enter') { const first = $('#dcSug [data-dcsug]'); if (first) { e.preventDefault(); dcSelect(first.dataset.dcsug, first.dataset.dcsugpid || null); } }
+  if (e.key === 'Escape') { $('#dcSug').hidden = true; }
+});
+document.addEventListener('click', e => { if (!e.target.closest('.dc-search')) { const b = $('#dcSug'); if (b) b.hidden = true; } });
 $('main').addEventListener('change', e => {
   if (e.target.id === 'nflWeekSel' && ui.vm) { ui.nflWeek = Number(e.target.value); ui.nflOpen = new Set(); renderMatchups(ui.vm); }
   if (e.target.id === 'plWeek' && ui.vm) { ui.pl.week = e.target.value === 'season' ? 'season' : Number(e.target.value); renderLeague(ui.vm); }
@@ -6590,6 +6920,7 @@ $('main').addEventListener('change', e => {
 });
 // Live filtering while typing or dragging: only the list is re-drawn, the controls stay put.
 $('main').addEventListener('input', e => {
+  if (e.target.id === 'dcQ') { ui.dc.q = e.target.value; dcSuggest(e.target.value); return; }
   if (!ui.vm || !['plQ', 'plMin'].includes(e.target.id)) return;
   if (e.target.id === 'plQ') ui.pl.q = e.target.value; else ui.pl.min = Number(e.target.value);
   updatePlList(ui.vm);
@@ -6700,6 +7031,28 @@ $('main').addEventListener('click', e => {
   if (sm && ui.vm) {
     ui.standingsMode = sm.dataset.smode;
     renderLeague(ui.vm);
+    return;
+  }
+  const wvv = e.target.closest('[data-wvview]');
+  if (wvv && ui.vm) { ui.wvView = wvv.dataset.wvview; renderWaivers(ui.vm); return; }
+  const dct = e.target.closest('[data-dcteam]');
+  if (dct && ui.vm) { dcSelect(dct.dataset.dcteam); return; }
+  const dcs = e.target.closest('[data-dcsug]');
+  if (dcs && ui.vm) { dcSelect(dcs.dataset.dcsug, dcs.dataset.dcsugpid || null); return; }
+  if (e.target.closest('[data-dcrefresh]') && ui.vm) {
+    const team = ui.dc.team; ui.dc.err = null; ui.dc.loading = true;
+    const b = e.target.closest('[data-dcrefresh]'); b.classList.add('is-refreshing');
+    dcLoad(team, 0).finally(() => { ui.dc.loading = false; if (ui.vm && ui.dc.team === team) renderDcBody(ui.vm); });
+    return;
+  }
+  const dca = e.target.closest('[data-dcadd]');
+  if (dca && ui.vm) {
+    ui.wvView = 'wire';
+    ui.evalAdd = dca.dataset.dcadd;
+    ui.evalDrop = ui.vm.suggestDrop(dca.dataset.dcadd) || '';
+    ui.evalShown = true;
+    renderWaivers(ui.vm);
+    $('#evalBox')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     return;
   }
   const plp = e.target.closest('[data-plpos]');
