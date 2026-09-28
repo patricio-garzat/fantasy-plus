@@ -1422,6 +1422,68 @@ html.settled .mu-bar span, html.settled .mc-bar span, html.settled .ss-conf span
 .md-note { margin-top: 10px; font-size: 12px; color: var(--muted); }
 .hero .live-rank { color: #A5B4FC; }
 
+/* Phone matchup viewer (swipe between matchups) */
+html.mv-lock, html.mv-lock body { overflow: hidden; overscroll-behavior: none; }
+.muv { position: fixed; inset: 0; z-index: 55; display: flex; flex-direction: column; background: var(--bg); animation: mvIn .22s var(--ease) both; }
+@keyframes mvIn { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+.mv-top { flex: none; display: grid; grid-template-columns: 44px minmax(0,1fr) 44px; align-items: center; padding: calc(8px + env(safe-area-inset-top)) 8px 4px; }
+.mv-close { width: 40px; height: 40px; border: 0; border-radius: 12px; background: transparent; color: var(--text); font-size: 30px; line-height: 1; cursor: pointer; }
+.mv-close:focus-visible, .mv-arrow:focus-visible, .mv-dot:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.mv-title { display: flex; flex-direction: column; align-items: center; line-height: 1.2; }
+.mv-title strong { font-size: 15px; }
+.mv-title span { font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.mv-nav { display: none; }
+.mv-dots { flex: none; display: flex; justify-content: center; flex-wrap: wrap; gap: 6px; padding: 4px 16px 10px; }
+.mv-dot { width: 7px; height: 7px; padding: 0; border: 0; border-radius: 999px; background: var(--border); cursor: pointer; transition: width .2s ease, background-color .2s ease; }
+.mv-dot.mine { background: rgba(129,140,248,.55); }
+.mv-dot.on { width: 20px; background: var(--text); }
+.mv-track { flex: 1; min-height: 0; display: flex; overflow-x: auto; overflow-y: hidden; scroll-snap-type: x mandatory; overscroll-behavior-x: contain; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+.mv-track::-webkit-scrollbar { display: none; }
+.mv-slide { flex: 0 0 100%; min-width: 0; scroll-snap-align: center; scroll-snap-stop: always; overflow-y: auto; overscroll-behavior-y: contain; padding: 0 12px calc(28px + env(safe-area-inset-bottom)); }
+.mv-head { position: sticky; top: 0; z-index: 2; margin: 0 -12px; padding: 10px 16px 14px; background: var(--bg); border-bottom: 1px solid var(--border-2); }
+.mv-teams { display: grid; grid-template-columns: minmax(0,1fr) auto minmax(0,1fr); align-items: start; gap: 8px; }
+.mv-t { display: flex; flex-direction: column; align-items: flex-start; min-width: 0; gap: 3px; }
+.mv-t.r { align-items: flex-end; text-align: right; }
+.mv-t .avatar { width: 40px; height: 40px; font-size: 13px; margin-bottom: 3px; }
+.mv-tn { max-width: 100%; font-size: 14px; font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.mv-tr { font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.mv-tr b { color: var(--accent); font-weight: 700; }
+.mv-st { margin-top: 12px; }
+.mv-scores { display: flex; justify-content: space-between; align-items: baseline; margin-top: 8px; }
+.mv-scores strong { font-size: 34px; font-weight: 800; letter-spacing: -.03em; font-variant-numeric: tabular-nums; color: var(--muted); border-radius: 8px; }
+.mv-scores strong.lead { color: var(--text); }
+.mv-proj { display: flex; justify-content: space-between; font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.mv-wp { height: 6px; margin-top: 10px; border-radius: 999px; background: rgba(248,113,113,.4); overflow: hidden; }
+.mv-wp span { display: block; height: 100%; border-radius: 999px; background: linear-gradient(90deg, #818CF8, #34D399); transition: width .6s var(--ease); }
+.mv-wpl { display: flex; justify-content: space-between; align-items: center; margin-top: 5px; font-size: 12px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.mv-wpl em { font-style: normal; font-weight: 500; color: var(--muted); font-size: 11px; }
+.mv-list { display: flex; flex-direction: column; }
+.mv-row { display: grid; grid-template-columns: minmax(0,1fr) 42px 34px 42px minmax(0,1fr); align-items: center; gap: 6px; min-height: 64px; padding: 6px 0; border-bottom: 1px solid var(--border-2); }
+.mv-slot { width: 34px; height: 22px; font-size: 10px; border-radius: 6px; }
+.mv-p { display: flex; flex-direction: column; gap: 1px; min-width: 0; padding: 0; border: 0; background: none; color: inherit; font: inherit; text-align: left; cursor: pointer; }
+.mv-p.r { align-items: flex-end; text-align: right; }
+.mv-p.empty { color: var(--warn); font-size: 12.5px; cursor: default; }
+.mv-pn { max-width: 100%; font-size: 13.5px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.mv-p:hover .mv-pn { color: var(--accent); }
+.mv-inj { font-style: normal; font-size: 10px; font-weight: 700; color: var(--bad); }
+.mv-ps, .mv-pg { max-width: 100%; font-size: 11.5px; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.mv-pg.live { color: #E5484D; font-weight: 600; }
+.mv-pts { display: flex; flex-direction: column; font-variant-numeric: tabular-nums; }
+.mv-pts.l { align-items: flex-end; }
+.mv-pts.r { align-items: flex-start; }
+.mv-pts b { font-size: 16px; font-weight: 800; border-radius: 5px; }
+.mv-pts em { font-style: normal; font-size: 10.5px; color: var(--muted); }
+.mv-pts.live b { color: #E5484D; }
+.mv-pts.pre b { color: var(--muted); font-weight: 500; }
+.mv-row.bench { min-height: 58px; }
+.mv-row.bench .mv-pn { font-weight: 500; color: var(--text-2); }
+.mv-pts.bn b { font-size: 14px; font-weight: 600; color: var(--text-2); }
+.mv-bh { margin: 18px 0 2px; font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); text-align: center; }
+html:not([data-theme="light"]) .mv-dot { background: rgba(255,255,255,.18); }
+html:not([data-theme="light"]) .mv-dot.on { background: #fff; }
+html:not([data-theme="light"]) .mv-dot.mine:not(.on) { background: rgba(129,140,248,.6); }
+html:not([data-theme="light"]) .mv-pg.live, html:not([data-theme="light"]) .mv-pts.live b { color: #FF6B72; }
+
 /* League players */
 .pl-filters { padding: 16px 18px; }
 .pl-pos { gap: 6px; }
@@ -1899,6 +1961,9 @@ html[data-theme="light"] .btn-primary:not(.btn-glow) { background: var(--text); 
 
 <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
 
+<!-- Phone matchup viewer: swipe between matchups (Sleeper-style) -->
+<div class="muv" id="muViewer" role="dialog" aria-modal="true" aria-label="Matchup" hidden></div>
+
 <!-- =========================================================
      PLAYER SHEET
      ========================================================= -->
@@ -2204,6 +2269,7 @@ async function getLiveGames(season, week, maxAgeMs = 50e3) {
         score: t.score, oppScore: o?.score ?? 0, opp: o?.abbr || null, home: t.home,
         hasBall: sit.possession ? String(sit.possession) === String(t.id) : false,
         down: st.state === 'in' ? sit.downDistanceText || '' : '', redZone: !!sit.isRedZone,
+        date: c.date || ev.date || null,
       };
     }
   }
@@ -3489,22 +3555,31 @@ function buildViewModel(raw, myRosterId) {
     const groups = {};
     for (const m of list) if (m.matchup_id != null) (groups[m.matchup_id] = groups[m.matchup_id] || []).push(m);
     const side = m => {
-      const slots = slotNames.map((slot, i) => {
-        const pid = m.starters?.[i];
-        if (!pid || pid === '0') return { slot, pid: null };
+      const mk = (pid, slot, pts) => {
         const pi = info(pid);
         const st = isCur ? nflStatus(pi.team) : 'complete';
-        const pts = (m.starters_points || [])[i] ?? m.players_points?.[pid] ?? 0;
         const proj = isCur ? projections?.[pid]?.[ptsKey] ?? null : null;
         const g = isCur ? gameByTeam[pi.team] : null;
         return { slot, pid, name: pi.name, pos: pi.pos, team: pi.team, inj: pi.inj, pts, proj, status: st, live: isCur ? liveStat(pid) : null,
           opp: g ? `${g.isHome ? 'vs' : '@'} ${g.opp}` : null, date: g?.date || null };
+      };
+      const slots = slotNames.map((slot, i) => {
+        const pid = m.starters?.[i];
+        if (!pid || pid === '0') return { slot, pid: null };
+        return mk(pid, slot, (m.starters_points || [])[i] ?? m.players_points?.[pid] ?? 0);
       });
+      const onField = new Set(m.starters || []);
+      const reserve = new Set(teamById[m.roster_id]?.reserve || []);
+      const POS_ORDER = ['QB', 'RB', 'WR', 'TE', 'K', 'DEF'];
+      const posRank = p => { const k = POS_ORDER.indexOf(p); return k < 0 ? 9 : k; };
+      const bench = (m.players || []).filter(pid => pid && pid !== '0' && !onField.has(pid))
+        .map(pid => mk(pid, reserve.has(pid) ? 'IR' : 'BN', m.players_points?.[pid] ?? 0))
+        .sort((a, b) => (a.slot === 'IR') - (b.slot === 'IR') || posRank(a.pos) - posRank(b.pos) || b.pts - a.pts);
       const remaining = isCur ? sum(slots.filter(x => x.pid).map(x =>
         x.status === 'pre_game' ? (x.proj || 0) : x.status === 'in_game' ? Math.max(0, (x.proj || 0) - x.pts) * 0.5 : 0)) : 0;
       const left = isCur ? slots.filter(x => x.pid && (x.status === 'pre_game' || x.status === 'in_game')).length : 0;
       const playing = isCur ? slots.filter(x => x.pid && x.status === 'in_game').length : 0;
-      return { team: teamById[m.roster_id], points: m.points || 0, projected: (m.points || 0) + remaining, remaining, left, playing, slots };
+      return { team: teamById[m.roster_id], points: m.points || 0, projected: (m.points || 0) + remaining, remaining, left, playing, slots, bench };
     };
     return Object.values(groups).filter(g => g.length === 2).map(([a, b]) => {
       let A = side(a), B = side(b);
@@ -3625,7 +3700,7 @@ function buildViewModel(raw, myRosterId) {
   const myOppId = myMatch ? oppOf(currentMatchups, myMatch)?.roster_id ?? null : null;
 
   return {
-    rosterOf, myOppId, liveStat, rosteredPlayers, seasonStatsMissing, scoreStats,
+    rosterOf, myOppId, liveStat, rosteredPlayers, liveGameOf: team => liveGames?.[team] || null, seasonStatsMissing, scoreStats,
     league, state, timeline, teams, me, N, cfg, ptsKey, leagueRows, lineup, posPoints, meRow,
     liveStandings, playoffTeams: league.settings?.playoff_teams || null, matchupWeeks, buildMatchups,
     searchPlayers, startSitDefault, allowRank, statWeeksUsed: statWeeks, usageOf, lineFor, lines: lines || {},
@@ -3892,6 +3967,7 @@ const muModes = vm => `<div class="stand-modes mu-modes" role="group" aria-label
   .map(([k, l]) => `<button type="button" class="smode${ui.muView === k ? ' on' : ''}" data-muview="${k}" aria-pressed="${ui.muView === k}">${k === 'nfl' && vm.gamesLive ? '<span class="ldot"></span>' : ''}${l}</button>`).join('')}</div>`;
 
 function renderMatchups(vm) {
+  if (mv.open) renderMatchupViewer(vm);
   if (ui.muView === 'nfl') { renderNflScores(vm); return; }
   const weeks = vm.matchupWeeks;
   const panel = $('#panel-matchups');
@@ -3902,7 +3978,7 @@ function renderMatchups(vm) {
   if (!weeks.includes(ui.muWeek)) ui.muWeek = weeks[weeks.length - 1];
   const w = ui.muWeek;
   const list = vm.buildMatchups(w);
-  if (!ui.muOpenInit) { const mine = list.find(m => m.mine); if (mine) ui.muOpen.add(mine.id); ui.muOpenInit = true; }
+  if (!ui.muOpenInit && !mqPhone.matches) { const mine = list.find(m => m.mine); if (mine) ui.muOpen.add(mine.id); ui.muOpenInit = true; }
   const ls = vm.live && vm.live.week === w ? vm.live : null;
   const sub = ls && !ls.final && ls.games
     ? `${ls.gamesFinal} of ${ls.games} NFL games final${ls.gamesLive ? ` · ${ls.gamesLive} in progress` : ''} · live updates every 15 s`
@@ -3951,7 +4027,7 @@ function renderMatchups(vm) {
       ${list.map((m, i) => {
         const pA = Math.round(m.pA * 100), pB = 100 - pA;
         const status = !m.open ? 'Final' : m.started ? 'Live' : 'Upcoming';
-        const isOpen = ui.muOpen.has(m.id);
+        const isOpen = !mqPhone.matches && ui.muOpen.has(m.id);
         return `<article class="card mc ${m.mine ? 'mine' : ''} ${isOpen ? 'open' : ''} reveal" style="--i:${i}">
           <button type="button" class="mc-head" data-mutoggle="${esc(m.id)}" aria-expanded="${isOpen}">
             <span class="mc-top">
@@ -4128,6 +4204,171 @@ async function nflTick() {
     ui.nflBusy = false;
   }
 }
+
+/* ---------- Phone matchup viewer: full screen, swipe from matchup to matchup (like the Sleeper app) ---------- */
+const mqPhone = window.matchMedia('(max-width: 640px)');
+const mv = { open: false, week: null, idx: 0 };
+
+function openMatchupViewer(id) {
+  const vm = ui.vm;
+  if (!vm) return;
+  const list = vm.buildMatchups(ui.muWeek);
+  mv.open = true;
+  mv.week = ui.muWeek;
+  mv.idx = Math.max(0, list.findIndex(m => m.id === id));
+  mv.lastFocus = document.activeElement;
+  $('#muViewer').hidden = false;
+  document.documentElement.classList.add('mv-lock');
+  renderMatchupViewer(vm, { fresh: true });
+  flashChanges();
+  // Phone "back" closes the viewer instead of leaving the page.
+  try { history.pushState({ fpViewer: 1 }, ''); } catch { /* ignore */ }
+  $('#muViewer .mv-close')?.focus({ preventScroll: true });
+}
+
+function closeMatchupViewer({ fromHistory = false } = {}) {
+  if (!mv.open) return;
+  mv.open = false;
+  $('#muViewer').hidden = true;
+  $('#muViewer').innerHTML = '';
+  document.documentElement.classList.remove('mv-lock');
+  if (!fromHistory && history.state?.fpViewer) { try { history.back(); } catch { /* ignore */ } }
+  mv.lastFocus?.focus?.({ preventScroll: true });
+}
+
+/** Short game line under a player: live clock, final score, or kickoff time. */
+function mvGameText(vm, x, isCur) {
+  if (!x.team) return 'Free agent';
+  if (!isCur) return '';
+  if (x.status === 'bye') return 'Bye';
+  const g = vm.liveGameOf(x.team);
+  if (x.status === 'in_game') return g ? `${g.clock.replace(/\s+-\s+/, ' · ')}${g.hasBall ? ' · 🏈' : ''}` : 'Live';
+  if (x.status === 'complete') {
+    if (!g) return 'Final';
+    const r = g.score > g.oppScore ? 'W' : g.score < g.oppScore ? 'L' : 'T';
+    return `Final · ${r} ${g.score}-${g.oppScore}`;
+  }
+  const d = g?.date ? new Date(g.date) : null;
+  const when = d ? `${d.toLocaleDateString([], { weekday: 'short' })} ${d.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }).replace(':00', '').replace(/\s?([AP])\.?M\.?/i, (_, x) => x.toLowerCase() + 'm')}`
+    : x.date ? new Date(`${x.date}T12:00:00`).toLocaleDateString([], { weekday: 'short' }) : '';
+  return [x.opp, when].filter(Boolean).join(' · ');
+}
+
+function renderMatchupViewer(vm, { fresh = false } = {}) {
+  const box = $('#muViewer');
+  if (!box || !mv.open) return;
+  const list = vm.buildMatchups(mv.week);
+  if (!list.length) { closeMatchupViewer(); return; }
+  mv.idx = Math.min(mv.idx, list.length - 1);
+  const isCur = mv.week === vm.timeline.current;
+  const n = list.length;
+  const shortName = (nm, pos) => { const p = String(nm).split(' '); if (pos === 'DEF') return p[p.length - 1]; return p.length > 1 && p[0].length > 2 ? `${p[0][0]}. ${p.slice(1).join(' ')}` : nm; };
+  const rec = t => (t ? `${t.wins}-${t.losses}${t.ties ? '-' + t.ties : ''}` : '');
+
+  const cell = (x, side, benchRow) => {
+    if (!x || !x.pid) return side === 'l'
+      ? '<span class="mv-p l empty">Empty</span><span class="mv-pts l"></span>'
+      : '<span class="mv-pts r"></span><span class="mv-p r empty">Empty</span>';
+    const pre = isCur && x.status === 'pre_game';
+    const live = isCur && x.status === 'in_game';
+    const info = `<button type="button" class="mv-p ${side} pl-link" data-pid="${esc(x.pid)}">
+        <span class="mv-pn">${esc(shortName(x.name, x.pos))}${x.inj ? ` <i class="mv-inj">${esc(x.inj === 'Questionable' ? 'Q' : x.inj === 'Doubtful' ? 'D' : x.inj.slice(0, 3).toUpperCase())}</i>` : ''}</span>
+        <span class="mv-ps">${esc(x.pos)}${x.team ? ` · ${esc(x.team)}` : ''}</span>
+        <span class="mv-pg ${live ? 'live' : ''}">${esc(mvGameText(vm, x, isCur))}</span>
+      </button>`;
+    const pts = `<span class="mv-pts ${side} ${live ? 'live' : ''} ${pre ? 'pre' : ''} ${benchRow ? 'bn' : ''}">
+        <b data-lk="mvp:${esc(x.pid)}">${pre ? '—' : f1(x.pts)}</b>${isCur && x.proj != null ? `<em>${f1(x.proj)}</em>` : ''}</span>`;
+    return side === 'l' ? info + pts : pts + info;
+  };
+  const row = (a, b, label, cls, benchRow) => `<div class="mv-row ${benchRow ? 'bench' : ''}">${cell(a, 'l', benchRow)}<span class="slot mv-slot ${cls}">${esc(label)}</span>${cell(b, 'r', benchRow)}</div>`;
+
+  const slide = (m, i) => {
+    const { A, B } = m;
+    const pA = Math.round(m.pA * 100), pB = 100 - pA;
+    const status = !m.open ? 'Final' : m.started ? 'Live' : 'Upcoming';
+    const starters = A.slots.map((a, k) => {
+      const b = B.slots[k];
+      return row(a, b, SLOT_LABEL[a.slot] || a.slot, SLOT_LABEL[a.slot] ? 'slot-flex' : `slot-${a.slot}`, false);
+    }).join('');
+    const nb = Math.max(A.bench.length, B.bench.length);
+    const bench = Array.from({ length: nb }, (_, k) => {
+      const a = A.bench[k] || null, b = B.bench[k] || null;
+      const lbl = (a || b)?.slot === 'IR' || (!a && b?.slot === 'IR') ? 'IR' : 'BN';
+      return row(a, b, lbl, 'slot-bn', true);
+    }).join('');
+    const team = (S, side) => `
+      <div class="mv-t ${side}">
+        ${avatarHtml(S.team?.avatar, S.team?.name || '?')}
+        <span class="mv-tn">${esc(S.team?.name || 'Team')}</span>
+        <span class="mv-tr">${rec(S.team)}${S.team?.rosterId === vm.me.rosterId ? ' · <b>You</b>' : ''}</span>
+      </div>`;
+    return `<section class="mv-slide" role="group" aria-roledescription="slide" aria-label="Matchup ${i + 1} of ${n}" data-mvi="${i}">
+      <div class="mv-head">
+        <div class="mv-teams">${team(A, 'l')}<span class="mc-status s-${status.toLowerCase()} mv-st">${status === 'Live' ? '<span class="ldot"></span>' : ''}${status}</span>${team(B, 'r')}</div>
+        <div class="mv-scores">
+          <strong class="${A.points >= B.points ? 'lead' : ''}" data-lk="mv:${A.team?.rosterId}">${f1(A.points)}</strong>
+          <strong class="${B.points > A.points ? 'lead' : ''}" data-lk="mv:${B.team?.rosterId}">${f1(B.points)}</strong>
+        </div>
+        ${m.open ? `<div class="mv-proj"><span>Proj ${f1(A.projected)}</span><span>Proj ${f1(B.projected)}</span></div>
+          <div class="mv-wp" aria-label="Win probability ${pA}% to ${pB}%"><span style="width:${pA}%"></span></div>
+          <div class="mv-wpl"><span>${pA}%</span><em>Win probability</em><span>${pB}%</span></div>` : ''}
+      </div>
+      <div class="mv-list">${starters}</div>
+      ${nb ? `<h3 class="mv-bh">Bench</h3><div class="mv-list">${bench}</div>` : ''}
+    </section>`;
+  };
+
+  // Keep the reader's place across live re-draws.
+  const oldTrack = $('#mvTrack');
+  const tops = oldTrack ? [...oldTrack.children].map(el => el.scrollTop) : [];
+  box.innerHTML = `
+    <header class="mv-top">
+      <button type="button" class="mv-close" data-mvclose aria-label="Back to matchups">‹</button>
+      <div class="mv-title"><strong>Week ${mv.week}</strong><span id="mvCount">Matchup ${mv.idx + 1} of ${n}</span></div>
+      <span class="mv-nav">
+        <button type="button" class="mv-arrow" data-mvstep="-1" aria-label="Previous matchup">‹</button>
+        <button type="button" class="mv-arrow" data-mvstep="1" aria-label="Next matchup">›</button>
+      </span>
+    </header>
+    <div class="mv-dots" role="tablist" aria-label="Matchups">${list.map((m, i) => `<button type="button" class="mv-dot ${i === mv.idx ? 'on' : ''} ${m.mine ? 'mine' : ''}" data-mvgo="${i}" aria-label="Matchup ${i + 1}${m.mine ? ' (yours)' : ''}" aria-selected="${i === mv.idx}"></button>`).join('')}</div>
+    <div class="mv-track" id="mvTrack">${list.map(slide).join('')}</div>`;
+  const track = $('#mvTrack');
+  track.scrollLeft = mv.idx * track.clientWidth;
+  if (!fresh) [...track.children].forEach((el, i) => { if (tops[i]) el.scrollTop = tops[i]; });
+  track.addEventListener('scroll', () => {
+    const i = Math.round(track.scrollLeft / Math.max(1, track.clientWidth));
+    if (i === mv.idx || i < 0 || i >= n) return;
+    mv.idx = i;
+    $('#mvCount').textContent = `Matchup ${i + 1} of ${n}`;
+    $$('#muViewer .mv-dot').forEach((d, k) => { d.classList.toggle('on', k === i); d.setAttribute('aria-selected', String(k === i)); });
+  }, { passive: true });
+}
+
+function mvGo(i) {
+  const track = $('#mvTrack');
+  if (!track) return;
+  const n = track.children.length;
+  const k = Math.max(0, Math.min(n - 1, i));
+  track.scrollTo({ left: k * track.clientWidth, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+}
+
+$('#muViewer').addEventListener('click', e => {
+  if (e.target.closest('[data-mvclose]')) { closeMatchupViewer(); return; }
+  const go = e.target.closest('[data-mvgo]');
+  if (go) { mvGo(Number(go.dataset.mvgo)); return; }
+  const st = e.target.closest('[data-mvstep]');
+  if (st) mvGo(mv.idx + Number(st.dataset.mvstep));
+});
+document.addEventListener('keydown', e => {
+  if (!mv.open || !$('#playerSheet').hidden) return;
+  if (e.key === 'Escape') closeMatchupViewer();
+  else if (e.key === 'ArrowRight') mvGo(mv.idx + 1);
+  else if (e.key === 'ArrowLeft') mvGo(mv.idx - 1);
+});
+window.addEventListener('popstate', () => { if (mv.open) closeMatchupViewer({ fromHistory: true }); });
+// Rotating to landscape / resizing past phone width: go back to the normal list.
+mqPhone.addEventListener?.('change', () => { if (!mqPhone.matches && mv.open) closeMatchupViewer(); if (ui.vm) renderMatchups(ui.vm); });
+window.addEventListener('resize', () => { const t = $('#mvTrack'); if (mv.open && t) t.scrollLeft = mv.idx * t.clientWidth; });
 
 /* ---------- My Team ---------- */
 const SLOT_LABEL = { FLEX: 'FLEX', SUPER_FLEX: 'SF', REC_FLEX: 'W/T', WRRB_FLEX: 'W/R', IDP_FLEX: 'IDP' };
@@ -6110,6 +6351,7 @@ $('main').addEventListener('click', e => {
     return;
   }
   const mt = e.target.closest('[data-mutoggle]');
+  if (mt && ui.vm && mqPhone.matches) { openMatchupViewer(mt.dataset.mutoggle); return; }
   if (mt && ui.vm) {
     const id = mt.dataset.mutoggle;
     if (ui.muOpen.has(id)) ui.muOpen.delete(id); else ui.muOpen.add(id);
