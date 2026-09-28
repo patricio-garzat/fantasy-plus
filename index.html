@@ -2330,9 +2330,20 @@ async function resolveEspnId(pid, name, pos) {
   let map = {};
   try { map = JSON.parse(localStorage.getItem(cacheKey) || '{}'); } catch { /* ignore */ }
   if (map[pid]) return map[pid];
-  const norm = x => String(x).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]/g, '');
-  const d = await httpGet(`https://site.web.api.espn.com/apis/common/v3/search?query=${encodeURIComponent(name)}&limit=5&type=player&sport=football&league=nfl`);
-  const hit = (d?.items || []).find(it => it.league === 'nfl' && norm(it.displayName) === norm(name));
+  // ESPN often adds a suffix Sleeper leaves out ("Kenneth Walker III", "Kyle Pitts Sr."), so compare without it.
+  const norm = x => String(x).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase()
+    .replace(/[\s,]+(jr|sr|ii|iii|iv|v)\.?$/, '').replace(/[^a-z0-9]/g, '');
+  const team = memo.players?.data?.[pid]?.t || null;
+  const d = await httpGet(`https://site.web.api.espn.com/apis/common/v3/search?query=${encodeURIComponent(name)}&limit=8&type=player&sport=football&league=nfl`);
+  // Same name on two players (e.g. two Josh Allens): prefer the one on his team and at his position.
+  const hit = (d?.items || [])
+    .filter(it => it.league === 'nfl' && norm(it.displayName) === norm(name))
+    .map(it => {
+      const tAbbr = (it.teamRelationships || []).map(r => r.core?.abbreviation).find(Boolean);
+      const tm = tAbbr ? ESPN_TEAM[tAbbr] || tAbbr : null;
+      return { it, score: (team && tm === team ? 2 : 0) + (pos && it.position?.abbreviation === pos ? 1 : 0) + (it.isActive ? 0.5 : 0) };
+    })
+    .sort((a, b) => b.score - a.score)[0]?.it;
   if (!hit) return null;
   map[pid] = String(hit.id);
   try { localStorage.setItem(cacheKey, JSON.stringify(map)); } catch { /* ignore */ }
@@ -2599,7 +2610,7 @@ function analyzeNews(pi, o, now = Date.now()) {
     const eff = r.score * rec;
     if (!best || Math.abs(eff) > Math.abs(best.eff)) best = { ...it, age, eff, label: r.label };
   }
-  return best ? { score: best.eff, label: best.label, item: best } : latest && latest.age <= 14 ? { score: 0, label: null, item: latest } : null;
+  return best ? { score: best.eff, label: best.label, item: best } : latest ? { score: 0, label: null, item: latest } : null;
 }
 
 /** Fetch and read news for these players (cached 15 min). Resolves to how many were newly read. */
