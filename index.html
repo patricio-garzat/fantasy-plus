@@ -1484,6 +1484,19 @@ html:not([data-theme="light"]) .mv-dot.on { background: #fff; }
 html:not([data-theme="light"]) .mv-dot.mine:not(.on) { background: rgba(129,140,248,.6); }
 html:not([data-theme="light"]) .mv-pg.live, html:not([data-theme="light"]) .mv-pts.live b { color: #FF6B72; }
 
+/* Role signals / news */
+.role-tag { display: inline-flex; align-items: center; height: 20px; padding: 0 7px; border-radius: 6px; font-size: 11px; font-weight: 700; color: var(--muted); background: var(--neutral-bg); white-space: nowrap; }
+.role-tag.up { color: var(--good); background: var(--good-bg); }
+.role-tag.down { color: var(--bad); background: var(--bad-bg); }
+.news-line { margin-top: 10px; padding: 8px 10px; border-radius: 10px; border-left: 3px solid var(--border); background: var(--surface-2); font-size: 12.5px; line-height: 1.45; color: var(--text-2); overflow-wrap: anywhere; }
+.news-line.up { border-left-color: #34D399; }
+.news-line.down { border-left-color: #F87171; }
+.news-line .nl-src { display: block; margin-bottom: 2px; font-size: 10.5px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: var(--muted); }
+.news-line a { color: inherit; text-decoration: none; }
+.news-line a:hover { color: var(--accent); text-decoration: underline; }
+html:not([data-theme="light"]) .role-tag.up { color: #6EE7B7; background: rgba(52,211,153,.12); }
+html:not([data-theme="light"]) .role-tag.down { color: #FCA5A5; background: rgba(248,113,113,.12); }
+
 /* League players */
 .pl-filters { padding: 16px 18px; }
 .pl-pos { gap: 6px; }
@@ -2339,6 +2352,139 @@ async function getEspnOverview(espnId) {
   return data;
 }
 
+/* ---- Player news → role signal (ESPN / RotoWire notes, read with simple phrase rules) ---- */
+const newsStore = new Map();   // pid -> { ts, a: analysis | null }
+const newsInflight = new Map();
+let newsVersion = 0;
+
+// Phrase rules. `mate` = what the same phrase means for this player when it's about a teammate at his position.
+const NEWS_RULES = [
+  { re: /\b(out for the (season|year)|season-ending|placed on (injured reserve|ir)\b|(to|onto) (injured reserve|ir)\b|lands? on (injured reserve|ir)\b|torn|tears? (his|an?)\b|ruptured|fractured?|surgery|out (indefinitely|several weeks|multiple weeks|\d+(-to-\d+|-\d+)? weeks)|miss (around |about |roughly |at least )?(\d+|several|multiple)(-to-\d+|-\d+)? weeks)/i, w: -1, label: 'Long-term injury', mate: [0.5, 'Teammate out'] },
+  { re: /\b(released|waived|cut by|suspended|suspension)\b/i, w: -0.8, label: 'Released or suspended', mate: [0.5, 'Teammate out'] },
+  { re: /\b(ruled (out|inactive)|won't play|will not play|will miss|is out (for|against|this|sunday|monday|thursday|saturday|week)|inactive for|sidelined)\b/i, w: -0.5, label: 'Out this week', mate: [0.5, 'Teammate out'] },
+  { re: /\b(benched|demoted|lost (the|his) (starting )?(job|role|spot)|losing (snaps|work|touches)|reduced role|diminished role|smaller role|backup role|split (carries|work|backfield)|committee)\b/i, w: -0.45, label: 'Role shrinking', mate: [0.3, 'Teammate losing work'] },
+  { re: /\b(will start|expected to start|in line (to|for) (start|serve|see|handle|lead|take|a (bigger|larger|significant))|set to start|slated to start|poised to start|named (the )?starter|takes? over|take the reins|starting role|lead (back|role|rusher)|bell-?cow|workhorse|featured role|expanded role|increased role|bigger role|larger role|more (snaps|touches|work|targets|opportunities)|next man up|promoted|atop the depth chart|top of the depth chart|move up .{0,24}depth chart|first-team|every-down|primary (back|option|target|ball ?carrier)|top (target|backup)|no\. 1 (receiver|wideout|option|back|running back|tight end|target|wr|rb|te)|only healthy (tight end|running back|receiver|wideout|quarterback|te|rb|wr|qb))\b/i, w: 0.6, label: 'Role growing', mate: [-0.3, 'Teammate taking work'] },
+  { re: /\b(activated from|designated to return|returns? to practice|full practice|practiced fully|cleared (to play|for|the)|no injury designation|doesn't have a designation|will play|off the injury report)\b/i, w: 0.3, label: 'Healthy', mate: [-0.25, 'Teammate returning'] },
+  { re: /\b(traded to|acquired by|signs? with|signed by|claimed off waivers|signed .{0,30} to the active roster)\b/i, w: 0.15, label: 'New team', mate: null },
+];
+const NEGATION = /\b(not|no longer|won't|isn't|wasn't|unlikely to|doesn't|didn't|avoid(ed|s)?|no)\s+(\w+\s+){0,2}$/i;
+const reEsc = x => String(x).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+let newsNameIdx = null;
+/** Full player names → team / position, to tell who a sentence is about. */
+function newsNames() {
+  const players = ui.raw?.players;
+  if (!players) return { full: new Map(), byTeam: new Map() };
+  if (newsNameIdx?.src === players) return newsNameIdx;
+  const full = new Map(), byTeam = new Map();
+  for (const [pid, p] of Object.entries(players)) {
+    if (!p?.n || p.p === 'DEF') continue;
+    const k = p.n.toLowerCase();
+    if (!full.has(k) || p.t) full.set(k, { pid, t: p.t, p: p.p });
+    if (p.t) {
+      const lastN = p.n.split(' ').pop().toLowerCase();
+      const m = byTeam.get(p.t) || byTeam.set(p.t, new Map()).get(p.t);
+      if (!m.has(lastN)) m.set(lastN, { pid, t: p.t, p: p.p });
+    }
+  }
+  newsNameIdx = { src: players, full, byTeam };
+  return newsNameIdx;
+}
+
+/**
+ * Score a note from -1 (role / health going away) to +1 (role growing). Each phrase is credited to whoever
+ * the sentence is talking about at that point: this player, or a teammate at his position ("Collins ruled out"
+ * is good news for the next receiver up).
+ */
+function scoreNewsText(text, pi) {
+  const names = newsNames();
+  const last = String(pi.name).split(' ').pop().toLowerCase();
+  const mates = names.byTeam.get(pi.team) || new Map();
+  let pos = 0, neg = 0, posLabel = null, negLabel = null;
+  const addPos = (w, l) => { if (w > pos) { pos = w; posLabel = l; } };
+  const addNeg = (w, l) => { if (w < neg) { neg = w; negLabel = l; } };
+  const sentences = String(text).replace(/\s+/g, ' ').split(/(?<=[a-z0-9)"'”][.!?])\s+(?=["“A-Z])/);
+  for (const st of sentences) {
+    const mentions = [];
+    for (const m of st.matchAll(new RegExp(`\\b${reEsc(last)}\\b`, 'gi'))) mentions.push({ i: m.index, self: true });
+    // Other players: "First Last" pairs from the player list, or a teammate's last name alone.
+    const caps = [...st.matchAll(/\b[A-Z][a-zA-Z.'’-]*/g)].map(m => ({ i: m.index, end: m.index + m[0].length, w: m[0].replace(/['’]s$/, '').replace(/\.$/, '') }));
+    for (let k = 0; k < caps.length; k++) {
+      const c = caps[k], nx = caps[k + 1];
+      const who = nx && nx.i === c.end + 1 ? names.full.get(`${c.w} ${nx.w}`.toLowerCase()) : null;
+      if (who) { if (who.pid !== pi.id) mentions.push({ i: c.i, who }); k++; continue; }
+      const low = c.w.toLowerCase();
+      if (low !== last && mates.has(low) && mates.get(low).pid !== pi.id) mentions.push({ i: c.i, who: mates.get(low) });
+    }
+    mentions.sort((a, b) => a.i - b.i);
+    const subjectAt = (i, end) => {
+      // "No. 1 WR Justin Jefferson": a name right after the phrase is who it describes.
+      const right = mentions.find(x => x.i >= end && x.i <= end + 2);
+      if (right) return right;
+      for (let k = mentions.length - 1; k >= 0; k--) if (mentions[k].i < i) return mentions[k];
+      return { self: true };
+    };
+    for (const r of NEWS_RULES) {
+      for (const m of st.matchAll(new RegExp(r.re.source, 'gi'))) {
+        const negated = NEGATION.test(st.slice(Math.max(0, m.index - 30), m.index));
+        const subj = subjectAt(m.index, m.index + m[0].length);
+        if (subj.self) {
+          if (r.w > 0) { if (negated) addNeg(-0.4, 'Role shrinking'); else addPos(r.w, r.label); }
+          else if (!negated) addNeg(r.w, r.label);
+        } else if (r.mate && subj.who.t === pi.team && subj.who.p === pi.pos && !negated) {
+          if (r.mate[0] > 0) addPos(r.mate[0], r.mate[1]); else addNeg(r.mate[0], r.mate[1]);
+        }
+      }
+    }
+  }
+  const score = Math.max(-1, Math.min(1, pos + neg));
+  return { score, label: score > 0 ? posLabel : score < 0 ? negLabel : null };
+}
+
+/** The most telling recent note about a player, and what it means for his value. */
+function analyzeNews(pi, o, now = Date.now()) {
+  const last = String(pi.name).split(' ').pop().toLowerCase();
+  const items = [];
+  if (o?.update?.headline) items.push({ head: o.update.headline, text: `${o.update.headline} ${o.update.story || ''}`, date: o.update.date, src: 'RotoWire' });
+  for (const n of o?.news || []) if (last && n.headline.toLowerCase().includes(last)) items.push({ head: n.headline, text: n.headline, date: n.date, src: 'ESPN', url: n.url });
+  let best = null, latest = null;
+  for (const it of items) {
+    const age = it.date ? (now - Date.parse(it.date)) / 864e5 : 99;
+    if (!latest || age < latest.age) latest = { ...it, age };
+    if (age > 30) continue;
+    const rec = age <= 7 ? 1 : age <= 14 ? 0.6 : 0.3;
+    const r = scoreNewsText(it.text, pi);
+    if (!r.score) continue;
+    const eff = r.score * rec;
+    if (!best || Math.abs(eff) > Math.abs(best.eff)) best = { ...it, age, eff, label: r.label };
+  }
+  return best ? { score: best.eff, label: best.label, item: best } : latest && latest.age <= 14 ? { score: 0, label: null, item: latest } : null;
+}
+
+/** Fetch and read news for these players (cached 15 min). Resolves to how many were newly read. */
+async function loadNews(pids) {
+  const vm = ui.vm;
+  if (!vm) return 0;
+  const todo = [...new Set(pids)].filter(pid => pid && !(newsStore.has(pid) && Date.now() - newsStore.get(pid).ts < 15 * 60e3));
+  let added = 0;
+  const one = pid => {
+    if (newsInflight.has(pid)) return newsInflight.get(pid);
+    const job = (async () => {
+      const pi = vm.playerInfo(pid);
+      if (!pi || pi.pos === 'DEF' || pi.pos === 'K') { newsStore.set(pid, { ts: Date.now(), a: null }); return; }
+      const id = await optional('ESPN player id', resolveEspnId(pid, pi.name, pi.pos), null);
+      const o = id ? await optional('ESPN player page', getEspnOverview(id), null) : null;
+      newsStore.set(pid, { ts: Date.now(), a: o ? analyzeNews(pi, o) : null });
+      added++;
+    })().finally(() => newsInflight.delete(pid));
+    newsInflight.set(pid, job);
+    return job;
+  };
+  for (let i = 0; i < todo.length; i += 4) await Promise.all(todo.slice(i, i + 4).map(one));
+  if (added) newsVersion++;
+  return added;
+}
+
 /** NFL schedule with live game status: complete | in_game | pre_game (undocumented endpoint). */
 async function getSchedule(season) {
   const hit = memo.schedule;
@@ -2864,6 +3010,52 @@ function buildViewModel(raw, myRosterId) {
     const idx = N * (cfg.counts[P] || 1);
     repl[P] = vals[Math.min(idx, vals.length - 1)] || 0;
   }
+  /* ---- Role changes: depth chart + news ---- */
+  // Depth chart by team and spot (WRs are listed per spot: LWR / RWR / SWR).
+  const depthIdx = new Map();
+  for (const [pid, p] of Object.entries(players)) {
+    if (!p?.t || p.do == null || !['QB', 'RB', 'WR', 'TE'].includes(p.p)) continue;
+    const k = `${p.t}:${p.dp || p.p}`;
+    (depthIdx.get(k) || depthIdx.set(k, []).get(k)).push(pid);
+  }
+  const STARTERS_AT = { QB: 1, RB: 1, TE: 1, WR: 1 };
+  /** A starter ahead of this player is hurt: he's next in line for that work. */
+  const opportunityOf = pid => {
+    const p = players[pid];
+    if (!p?.t || p.do == null || !STARTERS_AT[p.p]) return null;
+    const ahead = (depthIdx.get(`${p.t}:${p.dp || p.p}`) || []).filter(x => x !== pid && players[x].p === p.p && players[x].do < p.do);
+    if (!ahead.length) return null;
+    const hurt = ahead.filter(x => { const i = info(x).inj; return OUT_STATUSES.includes(i) || i === 'Doubtful'; });
+    if (!hurt.length || ahead.length - hurt.length >= STARTERS_AT[p.p]) return null;
+    const top = hurt.sort((a, b) => valueOf(b) - valueOf(a))[0];
+    const inj = info(top).inj;
+    const refV = valueOf(top);
+    if (refV < 3) return null;
+    return { pid: top, name: info(top).name, inj, refV, conf: UNAVAILABLE.includes(inj) ? 0.75 : inj === 'Out' ? 0.6 : 0.4 };
+  };
+  const newsOf = pid => newsStore.get(pid)?.a || null;
+  let adjVer = -1;
+  const adjCache = new Map();
+  /** Value per week after role signals: inheriting a hurt starter's work, or news pointing up / down. */
+  const adjValue = (pid, v) => {
+    if (adjVer !== newsVersion) { adjCache.clear(); adjVer = newsVersion; }
+    const key = `${pid}:${v}`;
+    if (adjCache.has(key)) return adjCache.get(key);
+    let out = v, depthBump = 0, newsBump = 0;
+    const op = opportunityOf(pid);
+    if (op) { depthBump = op.conf * Math.max(0, 0.6 * op.refV - out); if (depthBump < 0.3) depthBump = 0; out += depthBump; }
+    const n = newsOf(pid);
+    if (n && n.score && !(depthBump && n.label === 'Teammate out')) {
+      const before = out;
+      if (n.score > 0) out += n.score * (0.15 * out + 0.5 * Math.max(0, (repl[posOf(pid)] ?? out) + 1 - out));
+      else out *= 1 + 0.6 * n.score;
+      newsBump = out - before;
+    }
+    const r = { v: out, op: depthBump ? op : null, depthBump, news: n, newsBump };
+    adjCache.set(key, r);
+    return r;
+  };
+  const adjV = pid => adjValue(pid, valueOf(pid)).v;
   const surplusOf = (rid, P) => (profiles[rid][P]?.bench || []).filter(x => x.v > 0 && x.v >= 0.8 * repl[P]);
   const needsOf = rid => gradesByTeam[rid].filter(g => g.pos !== 'FLEX' && g.p <= 0.35).map(g => g.pos);
   // A team never has "spare" players at a position it needs help at.
@@ -3067,6 +3259,9 @@ function buildViewModel(raw, myRosterId) {
     let score = 0.35 * clamp01(avgRecent / sc.pts) + 0.2 * clamp01((projVal || 0) / sc.pts) + 0.2 * clamp01((snapLast || 0) / sc.snap)
       + 0.1 * clamp01(Math.max(0, snapDelta) / 30) + 0.15 * clamp01(Math.log10(trend + 1) / 5);
     if (pinfo.inj === 'Out' || pinfo.inj === 'Doubtful') score *= 0.6;
+    // Next in line behind a hurt starter: the role is about to grow.
+    const opNow = opportunityOf(pid);
+    if (opNow) score += 0.15 * opNow.conf;
     const opportunity = score >= 0.55 ? 'High' : score >= 0.36 ? 'Medium' : 'Low';
 
     // Why — built only from real numbers.
@@ -3080,6 +3275,7 @@ function buildViewModel(raw, myRosterId) {
     if (avgRecent >= 8) why.push(recent.length > 1 ? `averaging ${f1(avgRecent)} pts over the last ${recent.length} games` : `scored ${f1(avgRecent)} pts last game`);
     if (projVal != null && projVal >= 7 && proj.opp) why.push(`projected for ${f1(projVal)} pts vs ${proj.opp}${projWeek ? ` in Week ${projWeek}` : ''}`);
     if (trend >= 1000) why.push(`added in ${fmtK(trend)} Sleeper leagues in the last ${CONFIG.TRENDING_HOURS} hours`);
+    if (opNow) why.unshift(`next in line with ${opNow.name} ${injuryText(opNow.inj)}`);
     const reason = why.length ? capitalize(why.slice(0, 2).join('; ')) + '.' : 'Limited role so far. Worth watching, not adding yet.';
 
     const signals = [];
@@ -3091,6 +3287,7 @@ function buildViewModel(raw, myRosterId) {
       if (use.rzPerG >= 1.5) signals.push(`${f1(use.rzPerG)} red-zone looks/gm`);
     }
     if (pinfo.depth && Number(pinfo.depth.slice(2)) <= 2) signals.push(`${pinfo.depth} on depth chart`);
+    if (opNow) signals.push(`Starter ahead (${opNow.name}) ${opNow.inj === 'Doubtful' ? 'doubtful' : 'out'}`);
     const d = dropped.get(pid);
     if (d) signals.push(`Dropped by ${teamById[d.rid]?.name || 'a team'}${d.week ? ` in Week ${d.week}` : ''}`);
     if (pinfo.inj) signals.push(`Injury: ${pinfo.inj}`);
@@ -3174,9 +3371,13 @@ function buildViewModel(raw, myRosterId) {
     const left = active.filter(x => x !== pid && posOf(x) === pos).length + (addPos === pos ? 1 : 0);
     return !(cfg.counts[pos] && left < cfg.counts[pos]);
   };
-  const moveNet = (w, dropId) => {
-    const vOf = pid => (pid === w.id ? w.value : valueOf(pid));
-    return teamPts([...myPids.filter(x => x !== dropId), w.id], vOf) - basePts;
+  /** Change in team strength (pts/week). With role signals by default; `statsOnly` = the numbers alone. */
+  const moveNet = (w, dropId, statsOnly = false) => {
+    if (statsOnly) return teamPts([...myPids.filter(x => x !== dropId), w.id], pid => (pid === w.id ? w.value : valueOf(pid))) - basePts;
+    const addV = adjValue(w.id, w.value).v;
+    const dropAdj = dropId ? adjV(dropId) : null;
+    const base = dropId && Math.abs(dropAdj - valueOf(dropId)) > 1e-6 ? teamPts(myPids, pid => (pid === dropId ? dropAdj : valueOf(pid))) : basePts;
+    return teamPts([...myPids.filter(x => x !== dropId), w.id], pid => (pid === w.id ? addV : valueOf(pid))) - base;
   };
   const bestDropFor = w => {
     let best = null;
@@ -3188,7 +3389,7 @@ function buildViewModel(raw, myRosterId) {
       if ((UNAVAILABLE.includes(pi.inj) || pi.inj === 'Out') && (ppgOf(pid) || 0) >= 0.8 * (repl[pos] ?? Infinity)) continue;
       if (!dropAllowed(pid, w.pos)) continue;
       const net = moveNet(w, pid);
-      if (!best || net > best.net + 1e-6 || (Math.abs(net - best.net) <= 1e-6 && valueOf(pid) < valueOf(best.pid))) best = { pid, net };
+      if (!best || net > best.net + 1e-6 || (Math.abs(net - best.net) <= 1e-6 && adjV(pid) < adjV(best.pid))) best = { pid, net };
     }
     return best;
   };
@@ -3271,11 +3472,14 @@ function buildViewModel(raw, myRosterId) {
     }
 
     const net = moveNet(w, dropId);
-    const vOf = pid => (pid === w.id ? w.value : valueOf(pid));
+    const netStats = moveNet(w, dropId, true);
+    const addAdj = adjValue(w.id, w.value);
+    const dropAdj = dropId ? adjValue(dropId, valueOf(dropId)) : null;
+    const vOf = pid => (pid === w.id ? addAdj.v : pid === dropId ? dropAdj.v : valueOf(pid));
     const afterPids = [...myPids.filter(x => x !== dropId), w.id];
 
     // 1. Overall effect on your team
-    const lineupDelta = lineupPts(afterPids, vOf) - lineupPts(myPids);
+    const lineupDelta = lineupPts(afterPids, vOf) - lineupPts(myPids, vOf);
     if (Math.abs(lineupDelta) >= 0.3) say(lineupDelta > 0 ? 'good' : 'bad', `Your best starting lineup ${lineupDelta > 0 ? 'gains' : 'loses'} about ${f1(Math.abs(lineupDelta))} pts per week.`);
     else say(net >= 0 ? 'neutral' : 'bad', net >= MIN_GAIN ? `Your starting lineup stays the same; this move ${net > 0 ? 'improves' : 'weakens'} your bench depth.` : `Your starting lineup stays the same either way.`);
 
@@ -3327,11 +3531,28 @@ function buildViewModel(raw, myRosterId) {
     }
     if (D && cur && me.starters.includes(dropId) && !gameDone(dropId)) say('neutral', `${D.name} is in your starting lineup this week, so update your lineup after the move.`);
 
-    // 7. Urgency and sample size
+    // 7. Role changes: depth chart and latest news
+    const quote = n => `${n.item.src}${n.item.date ? `, ${timeAgo(n.item.date)}` : ''}: "${n.item.head.length > 150 ? n.item.head.slice(0, 147) + '…' : n.item.head}"`;
+    if (addAdj.op) say('good', `${A.name} is next in line: ${addAdj.op.name} is ${injuryText(addAdj.op.inj)}. If that holds he should inherit a bigger role (about +${f1(addAdj.depthBump)} pts/week in this estimate).`);
+    if (addAdj.news?.score > 0) say('good', `News points to a bigger role for ${A.name} (${quote(addAdj.news)}).`);
+    else if (addAdj.news?.score < 0) say('bad', `News is a concern for ${A.name}: ${addAdj.news.label.toLowerCase()} (${quote(addAdj.news)}).`);
+    else if (addAdj.news?.item) say('neutral', `Latest on ${A.name} — ${quote(addAdj.news)}.`);
+    if (D && dropAdj.op) say('bad', `${D.name} is next in line too: ${dropAdj.op.name} is ${injuryText(dropAdj.op.inj)}, so his role may grow soon.`);
+    if (D && dropAdj.news?.score > 0) say('bad', `Careful: news points to a bigger role for ${D.name} (${quote(dropAdj.news)}). Dropping him now could backfire.`);
+    else if (D && dropAdj.news?.score < 0) say('good', `News backs the drop: ${D.name} — ${dropAdj.news.label.toLowerCase()} (${quote(dropAdj.news)}).`);
+    else if (D && dropAdj.news?.item) say('neutral', `Latest on ${D.name} — ${quote(dropAdj.news)}.`);
+    if (Math.abs(net - netStats) >= 0.5) {
+      const vs = v => (v >= 0.8 ? 'a good move' : v >= -0.3 ? 'a close call' : 'not worth it');
+      say('tip', vs(net) !== vs(netStats)
+        ? `The role signals change the answer: on the numbers alone this would be ${vs(netStats)} (${signed(netStats)} pts/week), with them it's ${signed(net)}.`
+        : `The role signals move this from ${signed(netStats)} to ${signed(net)} pts/week.`);
+    }
+
+    // 8. Urgency and sample size
     if (w.trend >= 1000) say('neutral', `${A.name} was added in ${fmtK(w.trend)} Sleeper leagues in the last ${CONFIG.TRENDING_HOURS} hours, so act before waivers run.`);
     if (A.games === 1) say('neutral', 'Small sample: only one recent game to go on.');
 
-    // 8. Better alternatives
+    // 9. Better alternatives
     if (openSpots === 0) {
       const best = bestDropFor(w);
       if (best && best.pid !== dropId && best.net >= MIN_GAIN && best.net - net >= 0.5) say('tip', `Better: drop ${info(best.pid).name} instead (${signed(best.net)} pts/week instead of ${signed(net)}).`);
@@ -3346,7 +3567,7 @@ function buildViewModel(raw, myRosterId) {
       : `No — ${D ? `${D.name} helps your team more than ${A.name}` : `${A.name} doesn't improve your team`}.`;
     const order = { bad: 0, good: 0, neutral: 1, tip: 2 };
     reasons.sort((a, b) => order[a.tone] - order[b.tone]);
-    return { verdict, headline, net, lineupDelta, depthDelta: net - lineupDelta, reasons, add: A, drop: D };
+    return { verdict, headline, net, netStats, lineupDelta, depthDelta: net - lineupDelta, reasons, add: { ...A, role: addAdj }, drop: D ? { ...D, role: dropAdj } : D };
   };
 
   /* ---- "Should I make this trade?" analyzer ---- */
@@ -3700,7 +3921,7 @@ function buildViewModel(raw, myRosterId) {
   const myOppId = myMatch ? oppOf(currentMatchups, myMatch)?.roster_id ?? null : null;
 
   return {
-    rosterOf, myOppId, liveStat, rosteredPlayers, liveGameOf: team => liveGames?.[team] || null, seasonStatsMissing, scoreStats,
+    rosterOf, myOppId, liveStat, rosteredPlayers, newsOf, opportunityOf, adjValue, liveGameOf: team => liveGames?.[team] || null, seasonStatsMissing, scoreStats,
     league, state, timeline, teams, me, N, cfg, ptsKey, leagueRows, lineup, posPoints, meRow,
     liveStandings, playoffTeams: league.settings?.playoff_teams || null, matchupWeeks, buildMatchups,
     searchPlayers, startSitDefault, allowRank, statWeeksUsed: statWeeks, usageOf, lineFor, lines: lines || {},
@@ -4876,10 +5097,20 @@ function setupCombo(vm) {
   });
 }
 
-function runEvaluation(vm) {
+async function runEvaluation(vm) {
   const err = $('#evalError');
   const out = $('#evalResult');
   if (!ui.evalAdd) { err.textContent = 'Search and pick a free agent to add.'; err.hidden = false; out.innerHTML = ''; return; }
+  // Read the latest news on both players first: it can change the answer.
+  const ids = [ui.evalAdd, ui.evalDrop].filter(Boolean);
+  if (ids.some(id => !newsStore.has(id))) {
+    const token = (ui.evalToken = (ui.evalToken || 0) + 1);
+    err.hidden = true;
+    out.innerHTML = '<p class="sheet-loading"><span class="dot-spin"></span>Checking the latest news…</p>';
+    await Promise.race([loadNews(ids), new Promise(r => setTimeout(r, 8000))]);
+    if (token !== ui.evalToken) return;
+    vm = ui.vm;
+  }
   const r = vm.evaluateMove(ui.evalAdd, ui.evalDrop || null);
   if (r.error) { err.textContent = r.error; err.hidden = false; out.innerHTML = ''; return; }
   err.hidden = true;
@@ -4902,7 +5133,9 @@ function runEvaluation(vm) {
           <div><dt>Weeks ${x.weeks.length ? `${x.weeks[0]}–${x.weeks[x.weeks.length - 1]}` : ''}</dt><dd class="small-dd">${last || '—'}</dd></div>
           ${x.pos !== 'K' && x.pos !== 'DEF' ? `<div><dt>Snap % last game</dt><dd>${x.snapLast != null ? x.snapLast + '%' : '—'}</dd></div>` : ''}
           <div><dt>Next game${x.projWeek ? ` · Wk ${x.projWeek}` : ''}</dt><dd>${x.proj != null ? `${f1(x.proj)}${x.projOpp ? ` <span class="muted">vs ${esc(x.projOpp)}</span>` : ''}` : '—'}</dd></div>
+          <div><dt>Role outlook</dt><dd>${roleTag(x.role)}</dd></div>
         </dl>
+        ${newsLine(x.role?.news)}
       </div>`;
   };
   out.innerHTML = `
@@ -4916,6 +5149,33 @@ function runEvaluation(vm) {
     <div class="cmp">${side('Add', r.add, 'add')}${side('Drop', r.drop, 'drop')}</div>
     <h3 class="why-title">Why</h3>
     <ul class="reasons">${r.reasons.map(x => `<li class="rs rs-${x.tone}"><span class="rs-ico" aria-hidden="true">${ico[x.tone]}</span><span>${esc(x.text)}</span></li>`).join('')}</ul>`;
+}
+
+/** "Role growing / Injury concern…" pill from depth chart and news signals. */
+function roleTag(role) {
+  if (!role) return '—';
+  const n = role.news;
+  if (role.op || (n && n.score >= 0.2)) return `<span class="role-tag up">▲ ${esc(role.op ? 'Next in line' : n.label)}</span>`;
+  if (n && n.score <= -0.2) return `<span class="role-tag down">▼ ${esc(n.label)}</span>`;
+  return '<span class="role-tag">Steady</span>';
+}
+/** Latest note on a player, with its source and age. */
+function newsLine(n) {
+  if (!n?.item) return '';
+  const it = n.item;
+  const tone = n.score >= 0.2 ? 'up' : n.score <= -0.2 ? 'down' : '';
+  const head = it.head.length > 160 ? it.head.slice(0, 157) + '…' : it.head;
+  return `<p class="news-line ${tone}"><span class="nl-src">${esc(it.src)}${it.date ? ` · ${esc(timeAgo(it.date))}` : ''}</span>${it.url ? `<a href="${esc(it.url)}" target="_blank" rel="noopener">${esc(head)}</a>` : esc(head)}</p>`;
+}
+/** Read news for the visible waiver cards and your roster, then re-rank with it (once per batch). */
+function queueWaiverNews(vm, list) {
+  const ids = [...list.map(p => p.id), ...list.map(p => p.move?.drop?.id).filter(Boolean), ...vm.me.players];
+  if (ids.every(id => newsStore.has(id))) return;
+  loadNews(ids).then(added => {
+    if (!added || !ui.vm || !ui.raw) return;
+    ui.vm = buildViewModel(ui.raw, ui.myRosterId);
+    if (ui.tab === 'waivers') renderWaiverList(ui.vm);
+  });
 }
 
 function renderWaiverList(vm) {
@@ -4957,6 +5217,7 @@ function renderWaiverList(vm) {
         <span class="badge badge-${p.recommendation}">${p.recommendation}</span>
       </div>
       <p class="wv-reason">${esc(p.reason)}</p>
+      ${newsLine(vm.newsOf(p.id))}
       <ul class="signals" aria-label="Signals">
         ${p.fits ? `<li class="fit">Fits your ${esc(p.pos)} need</li>` : ''}
         ${p.signals.filter(s => !s.startsWith('Added in')).map(s => `<li>${esc(s)}</li>`).join('')}
@@ -4977,6 +5238,7 @@ function renderWaiverList(vm) {
       </div>
     </article>`;
   }).join('');
+  queueWaiverNews(vm, list);
 }
 
 function moveHtml(p) {
