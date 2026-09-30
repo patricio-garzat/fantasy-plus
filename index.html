@@ -1571,6 +1571,119 @@ html:not([data-theme="light"]) .dc-fa { color: #6EE7B7; background: rgba(52,211,
 html:not([data-theme="light"]) .dc-you { color: #C7CCFF; background: rgba(129,140,248,.16); }
 html:not([data-theme="light"]) .dc-row.hl { background: rgba(99,102,241,.16); box-shadow: 0 0 0 6px rgba(99,102,241,.16); }
 
+/* What If */
+.wi-hero { padding: 20px 22px; background: linear-gradient(135deg, rgba(99,102,241,.10), rgba(52,211,153,.08)) , var(--surface); }
+.wi-cmp { display: flex; align-items: center; gap: 18px; }
+.wi-side { display: flex; flex-direction: column; min-width: 0; }
+.wi-k { font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+.wi-side strong { font-size: 38px; font-weight: 800; letter-spacing: -.03em; line-height: 1.1; font-variant-numeric: tabular-nums; border-radius: 8px; }
+.wi-side em { font-style: normal; font-size: 13px; color: var(--muted); }
+.wi-side em b { font-weight: 800; }
+.wi-side:not(.alt) strong { color: var(--muted); }
+.wi-side.alt.up em b, .wi-side.alt.up strong { color: var(--good); }
+.wi-side.alt.down em b, .wi-side.alt.down strong { color: var(--bad); }
+.wi-arrow { font-size: 26px; color: var(--muted); }
+.wi-line { margin-top: 12px; font-size: 14px; font-weight: 600; }
+.wi-fun { margin-top: 4px; font-size: 13px; color: var(--text-2); }
+.wi-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+.wi-actions .btn { height: 40px; font-size: 14px; }
+.wi-weeks { display: flex; gap: 6px; overflow-x: auto; margin: 16px 0 14px; padding: 2px 2px 6px; scrollbar-width: thin; -webkit-overflow-scrolling: touch; }
+.wi-wk { flex: none; min-width: 62px; display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 8px 8px 7px; border: 1px solid var(--border); border-radius: 12px; background: var(--surface); color: var(--text-2); font: inherit; cursor: pointer; transition: border-color .15s ease, background-color .15s ease; }
+.wi-wk:hover { border-color: var(--accent); }
+.wi-wk.on { border-color: var(--accent); background: var(--accent-soft); color: var(--text); box-shadow: 0 0 0 1px var(--accent) inset; }
+.wi-wk.flip-up { border-color: rgba(52,211,153,.6); }
+.wi-wk.flip-down { border-color: rgba(248,113,113,.6); }
+.wi-wk:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.wi-wkn { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 700; }
+.wi-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+.wi-wkr { display: inline-flex; align-items: center; gap: 3px; font-size: 12px; color: var(--muted); }
+.wi-wkr b, .wi-res { font-weight: 800; }
+.r-w { color: var(--good); }
+.r-l { color: var(--bad); }
+.r-t { color: var(--warn); }
+.wi-grid { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: 14px; align-items: start; }
+.wi-editor, .wi-table { padding: 16px 18px; min-width: 0; }
+.wi-eh { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
+.wi-eh h3 { font-size: 17px; font-weight: 800; }
+.wi-eh p { font-size: 13px; color: var(--muted); }
+.wi-ebtn { display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
+.wi-ebtn .btn { height: 34px; padding: 0 12px; font-size: 13px; }
+.wi-score { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px; }
+.wi-score > div { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 8px; padding: 10px 12px; border-radius: 12px; background: var(--surface-2); border: 1px solid var(--border-2); }
+.wi-score > div.alt { border-color: rgba(99,102,241,.35); }
+.wi-score span { width: 100%; font-size: 11px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: var(--muted); }
+.wi-score strong { font-size: 24px; font-weight: 800; font-variant-numeric: tabular-nums; border-radius: 6px; }
+.wi-score em { font-style: normal; font-size: 12.5px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.wi-score .wi-res { margin-left: auto; font-size: 16px; }
+.wi-med { margin-top: 8px; font-size: 12.5px; color: var(--muted); }
+.wi-hint { margin: 12px 0 4px; font-size: 12.5px; color: var(--muted); }
+.wi-slot { border-top: 1px solid var(--border-2); }
+.wi-slot:first-child { border-top: 0; }
+.wi-srow { width: 100%; display: grid; grid-template-columns: 46px 34px minmax(0,1fr) auto 22px; align-items: center; gap: 10px; padding: 9px 4px; border: 0; background: none; color: inherit; font: inherit; text-align: left; cursor: pointer; border-radius: 10px; transition: background-color .15s ease; }
+.wi-srow:hover { background: var(--surface-2); }
+.wi-srow:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+.wi-srow .slot { height: 24px; font-size: 10.5px; }
+.wi-slot.swapped .wi-srow { background: rgba(99,102,241,.07); }
+.wi-pm { min-width: 0; display: flex; flex-direction: column; }
+.wi-pn { font-weight: 600; font-size: 14px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.wi-ps { font-size: 12px; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.wi-ps s { color: var(--bad); }
+.wi-pts { font-size: 16px; font-weight: 800; font-variant-numeric: tabular-nums; }
+.wi-swap { color: var(--muted); font-size: 15px; text-align: center; }
+.wi-slot.open .wi-swap { color: var(--text); }
+.wi-cands { margin: 0 0 10px 56px; padding: 6px; border-radius: 12px; background: var(--surface-2); border: 1px solid var(--border-2); animation: rise .2s var(--ease) both; }
+.wi-cand { width: 100%; display: grid; grid-template-columns: 26px minmax(0,1fr) auto 56px; align-items: center; gap: 8px; padding: 7px 6px; border: 0; border-radius: 8px; background: none; color: inherit; font: inherit; text-align: left; cursor: pointer; }
+.wi-cand:hover { background: var(--surface); }
+.wi-cand:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+.wi-cn { font-size: 13.5px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.wi-cn em { font-style: normal; font-weight: 500; font-size: 11.5px; color: var(--muted); }
+.wi-cp { font-weight: 700; font-variant-numeric: tabular-nums; }
+.wi-cd { font-size: 12px; font-weight: 800; text-align: right; font-variant-numeric: tabular-nums; color: var(--muted); }
+.wi-cd.up { color: var(--good); }
+.wi-cd.down { color: var(--bad); }
+.wi-none { padding: 8px; font-size: 13px; color: var(--muted); }
+.wi-bh { margin: 14px 0 8px; font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+.wi-bench { display: flex; flex-wrap: wrap; gap: 6px; }
+.wi-bp { display: inline-flex; align-items: center; gap: 5px; padding: 2px 8px 2px 2px; border-radius: 999px; background: var(--surface-2); border: 1px solid var(--border-2); font-size: 12px; }
+.wi-bp em { font-style: normal; color: var(--muted); font-size: 11px; }
+.wi-bp b { font-variant-numeric: tabular-nums; }
+.wi-bp .avatar.xs { width: 20px; height: 20px; font-size: 8px; }
+.wi-th h3 { font-size: 17px; font-weight: 800; }
+.wi-th p { font-size: 12.5px; color: var(--muted); margin: 2px 0 8px; }
+.wi-row { display: grid; grid-template-columns: 22px 32px 28px minmax(0,1fr) auto 56px; align-items: center; gap: 8px; padding: 8px 4px; border-top: 1px solid var(--border-2); font-size: 13.5px; }
+.wi-row.head { border-top: 0; font-size: 11.5px; color: var(--muted); font-weight: 600; padding-top: 0; }
+.wi-row .avatar { width: 28px; height: 28px; font-size: 10px; }
+.wi-row.mine { background: var(--accent-soft); border-radius: 10px; border-top-color: transparent; }
+.wi-row.po-line { box-shadow: 0 2px 0 0 var(--accent); }
+.wi-rk { font-weight: 800; text-align: center; font-variant-numeric: tabular-nums; }
+.wi-mv { font-size: 11.5px; font-weight: 800; color: var(--muted); font-variant-numeric: tabular-nums; }
+.wi-mv.up { color: var(--good); }
+.wi-mv.down { color: var(--bad); }
+.wi-tn { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.wi-rec { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.wi-rec s { color: var(--muted); font-size: 12px; margin-right: 2px; }
+.wi-pf { text-align: right; color: var(--muted); font-variant-numeric: tabular-nums; }
+@media (max-width: 860px) { .wi-grid { grid-template-columns: minmax(0,1fr); } }
+@media (max-width: 640px) {
+  .wi-hero { padding: 16px; }
+  .wi-cmp { gap: 12px; }
+  .wi-side strong { font-size: 30px; }
+  .wi-actions .btn { flex: 1; }
+  .wi-weeks { margin-left: -16px; margin-right: -16px; padding-left: 16px; padding-right: 16px; scrollbar-width: none; }
+  .wi-weeks::-webkit-scrollbar { display: none; }
+  .wi-editor, .wi-table { padding: 14px; }
+  .wi-srow { grid-template-columns: 42px 30px minmax(0,1fr) auto 18px; gap: 8px; }
+  .wi-srow .avatar.sm { width: 30px; height: 30px; }
+  .wi-cands { margin-left: 0; }
+  .wi-row { grid-template-columns: 20px 30px 26px minmax(0,1fr) auto; }
+}
+html:not([data-theme="light"]) .wi-hero { background: linear-gradient(135deg, rgba(99,102,241,.16), rgba(52,211,153,.08)), var(--surface); }
+html:not([data-theme="light"]) .wi-wk { background: var(--surface); }
+html:not([data-theme="light"]) .wi-wk.on { background: rgba(99,102,241,.18); }
+html:not([data-theme="light"]) .wi-row.mine { background: rgba(99,102,241,.14); }
+html:not([data-theme="light"]) .wi-slot.swapped .wi-srow { background: rgba(99,102,241,.12); }
+html:not([data-theme="light"]) .wi-cand:hover { background: rgba(255,255,255,.05); }
+
 /* League players */
 .pl-filters { padding: 16px 18px; }
 .pl-pos { gap: 6px; }
@@ -3920,6 +4033,100 @@ function buildViewModel(raw, myRosterId) {
 
   /* ---- My Team: lineup by slot ---- */
   const slotNames = (league.roster_positions || []).filter(x => !['BN', 'IR', 'TAXI'].includes(x));
+  /* ---- What if: replay the season with different lineups of yours ---- */
+  const playoffStart = Number(league.settings?.playoff_week_start) || 99;
+  const wiList = w => (w === cur ? currentMatchups : matchups[w]) || [];
+  const wiWeeks = [...timeline.completed, ...(cur && weekFinal ? [cur] : [])]
+    .filter(w => w < playoffStart && wiList(w).some(m => m.roster_id === me.rosterId && m.matchup_id != null));
+  const slotElig = slot => FLEX_ELIG[slot] || [slot];
+  const r2 = x => Math.round(x * 100) / 100;
+  const wiWeekCache = new Map();
+  /** One of your weeks: who you could have played (everyone on your roster that week) and what each scored. */
+  const wiWeek = w => {
+    if (wiWeekCache.has(w)) return wiWeekCache.get(w);
+    const list = wiList(w);
+    const m = list.find(x => x.roster_id === me.rosterId);
+    if (!m) return null;
+    const opp = oppOf(list, m);
+    const ptsOf = pid => (pid ? m.players_points?.[pid] ?? 0 : 0);
+    const reserve = new Set(m.reserve || []);
+    const pool = [...new Set([...(m.players || []), ...(m.starters || [])])].filter(pid => pid && pid !== '0')
+      .map(pid => { const pi = info(pid); return { id: pid, name: pi.name, pos: pi.pos, team: pi.team, pts: ptsOf(pid), ir: reserve.has(pid) }; });
+    const starters = slotNames.map((_, i) => { const pid = m.starters?.[i]; return pid && pid !== '0' ? pid : null; });
+    const wk = { w, pool, starters, ptsOf, realPts: m.points || 0, oppPts: opp ? opp.points || 0 : null, oppTeam: opp ? teamById[opp.roster_id] : null,
+      realStarterPts: sum(starters.map(ptsOf)) };
+    wiWeekCache.set(w, wk);
+    return wk;
+  };
+  /** Your score with another set of starters (keeps any league adjustments Sleeper applied to the real score). */
+  const wiPoints = (wk, ids) => r2(wk.realPts + sum(ids.map(wk.ptsOf)) - wk.realStarterPts);
+  /** Best possible lineup that week: fill the most restrictive slots first with the top scorer who fits. */
+  const wiBest = wk => {
+    const used = new Set(), out = slotNames.map(() => null);
+    slotNames.map((s, i) => ({ s, i })).sort((a, b) => slotElig(a.s).length - slotElig(b.s).length).forEach(({ s, i }) => {
+      const c = wk.pool.filter(p => !used.has(p.id) && slotElig(s).includes(p.pos)).sort((a, b) => b.pts - a.pts)[0];
+      if (c) { out[i] = c.id; used.add(c.id); }
+    });
+    // Keep players who started anyway in their real spot, so only true changes show up.
+    const chosen = new Set(out.filter(Boolean));
+    const aligned = slotNames.map((_, i) => (wk.starters[i] && chosen.has(wk.starters[i]) ? wk.starters[i] : null));
+    const placed = new Set(aligned.filter(Boolean));
+    const rest = out.filter(id => id && !placed.has(id));
+    const open = slotNames.map((s, i) => ({ s, i })).filter(x => !aligned[x.i]).sort((a, b) => slotElig(a.s).length - slotElig(b.s).length);
+    const fits = (id, i) => slotElig(slotNames[i]).includes(info(id).pos);
+    for (const { i } of open) {
+      const k = rest.findIndex(id => fits(id, i));
+      if (k >= 0) aligned[i] = rest.splice(k, 1)[0];
+    }
+    // Someone left over: slide a kept starter into the open (flex) spot to make room for him.
+    for (const id of [...rest]) {
+      const hole = aligned.findIndex(x => !x);
+      const j = aligned.findIndex((x, k) => x && fits(id, k) && hole >= 0 && fits(x, hole));
+      if (j >= 0) { aligned[hole] = aligned[j]; aligned[j] = id; rest.splice(rest.indexOf(id), 1); }
+    }
+    return rest.length ? out : aligned;
+  };
+  /** Every week's scores (with your edits), replayed into wins, losses and points for all teams. */
+  const wiReplay = edits => {
+    const rec = new Map(teams.map(t => [t.rosterId, { wins: 0, losses: 0, ties: 0, pf: 0 }]));
+    const mine = [];
+    for (const w of wiWeeks) {
+      const list = wiList(w);
+      const scores = Object.fromEntries(list.map(m => [m.roster_id, m.points || 0]));
+      const wk = wiWeek(w);
+      if (edits?.[w]) scores[me.rosterId] = wiPoints(wk, edits[w]);
+      const med = medianGame ? median(Object.values(scores)) : null;
+      for (const m of list) {
+        const r = rec.get(m.roster_id);
+        if (!r || m.matchup_id == null) continue;
+        const opp = oppOf(list, m);
+        addWeek(r, scores[m.roster_id], opp ? scores[opp.roster_id] : null, med);
+        r.pf += scores[m.roster_id];
+      }
+      const my = scores[me.rosterId];
+      mine.push({ w, my, op: wk.oppPts, med, res: wk.oppPts == null ? null : my > wk.oppPts ? 'W' : my < wk.oppPts ? 'L' : 'T',
+        medRes: med == null ? null : my > med ? 'W' : my < med ? 'L' : 'T' });
+    }
+    return { rec, mine };
+  };
+  const wiBase = wiReplay(null);
+  /** Standings if your lineups had been `edits` ({ week: [pid per slot] }), anchored to the official table. */
+  const whatIfRun = edits => {
+    const alt = wiReplay(edits);
+    const rows = teams.map(t => {
+      const b = wiBase.rec.get(t.rosterId), a = alt.rec.get(t.rosterId);
+      return { team: t, real: { wins: t.wins, losses: t.losses, ties: t.ties, pf: t.pf, rank: t.rank },
+        wins: t.wins + a.wins - b.wins, losses: t.losses + a.losses - b.losses, ties: t.ties + a.ties - b.ties, pf: round1(t.pf + a.pf - b.pf) };
+    });
+    rows.sort(standingsSort).forEach((r, i) => { r.rank = i + 1; });
+    const weeks = alt.mine.map((x, i) => ({ ...x, real: wiBase.mine[i] }));
+    return { rows, weeks, me: rows.find(r => r.team.rosterId === me.rosterId) };
+  };
+  const whatIf = wiWeeks.length ? {
+    weeks: wiWeeks, slots: slotNames, elig: slotElig, week: wiWeek, points: wiPoints, best: wiBest, run: whatIfRun,
+    medianGame, playoffTeams: Number(league.settings?.playoff_teams) || null,
+  } : null;
+
   const lineup = slotNames.map((slot, i) => {
     const pid = me.starters[i];
     return { slot, player: pid && pid !== '0' ? line(pid, 'starter') : null };
@@ -4081,7 +4288,7 @@ function buildViewModel(raw, myRosterId) {
   const myOppId = myMatch ? oppOf(currentMatchups, myMatch)?.roster_id ?? null : null;
 
   return {
-    rosterOf, myOppId, liveStat, rosteredPlayers, ppgAny, newsOf, opportunityOf, adjValue, liveGameOf: team => liveGames?.[team] || null, seasonStatsMissing, scoreStats,
+    rosterOf, myOppId, liveStat, rosteredPlayers, whatIf, ppgAny, newsOf, opportunityOf, adjValue, liveGameOf: team => liveGames?.[team] || null, seasonStatsMissing, scoreStats,
     league, state, timeline, teams, me, N, cfg, ptsKey, leagueRows, lineup, posPoints, meRow,
     liveStandings, playoffTeams: league.settings?.playoff_teams || null, matchupWeeks, buildMatchups,
     searchPlayers, startSitDefault, allowRank, statWeeksUsed: statWeeks, usageOf, lineFor, lines: lines || {},
@@ -4753,20 +4960,176 @@ window.addEventListener('popstate', () => { if (mv.open) closeMatchupViewer({ fr
 mqPhone.addEventListener?.('change', () => { if (!mqPhone.matches && mv.open) closeMatchupViewer(); if (ui.vm) renderMatchups(ui.vm); });
 window.addEventListener('resize', () => { const t = $('#mvTrack'); if (mv.open && t) t.scrollLeft = mv.idx * t.clientWidth; });
 
+/* ---------- What If: replay your season with different lineups ---------- */
+const wiKey = () => `fa_whatif_${ui.leagueId}_${ui.myRosterId}`;
+function wiState() {
+  if (!ui.wi || ui.wi.key !== wiKey()) {
+    let edits = {};
+    try { edits = JSON.parse(store.get(wiKey()) || '{}') || {}; } catch { edits = {}; }
+    ui.wi = { key: wiKey(), edits, week: null, sel: null };
+  }
+  return ui.wi;
+}
+function wiSave() {
+  const st = ui.wi;
+  if (Object.keys(st.edits).length) store.set(st.key, JSON.stringify(st.edits)); else store.del(st.key);
+}
+const wiRec = r => `${r.wins}-${r.losses}${r.ties ? '-' + r.ties : ''}`;
+const wiShort = nm => { const p = String(nm).split(' '); return p.length > 1 && p[0].length > 2 ? `${p[0][0]}. ${p.slice(1).join(' ')}` : nm; };
+
+function renderWhatIf(vm) {
+  const W = vm.whatIf;
+  const body = $('#teamBody');
+  if (!W) { body.innerHTML = '<div class="card notice"><strong>Nothing to replay yet</strong>What If opens once your first regular-season week is final.</div>'; return; }
+  const st = wiState();
+  // Drop edits for weeks that no longer exist or no longer fit the roster slots.
+  for (const w of Object.keys(st.edits)) if (!W.weeks.includes(Number(w)) || st.edits[w].length !== W.slots.length) delete st.edits[w];
+  if (!W.weeks.includes(st.week)) st.week = W.weeks[W.weeks.length - 1];
+  const res = W.run(st.edits);
+  const me = res.me;
+  const edited = Object.keys(st.edits).length;
+  const bestAll = W.run(Object.fromEntries(W.weeks.map(w => [w, W.best(W.week(w))])));
+  const benchLeft = sum(W.weeks.map(w => { const wk = W.week(w); return W.points(wk, W.best(wk)) - wk.realPts; }));
+  const po = W.playoffTeams;
+  const inPO = rank => po && rank <= po;
+  const dRank = me.real.rank - me.rank;
+  const dPf = round1(me.pf - me.real.pf);
+
+  // 1. Summary
+  const hero = `
+    <section class="card wi-hero reveal">
+      <div class="wi-cmp">
+        <div class="wi-side"><span class="wi-k">Real</span><strong>${wiRec(me.real)}</strong><em>#${me.real.rank} of ${vm.N}${po ? ` · ${inPO(me.real.rank) ? 'in playoffs' : 'out of playoffs'}` : ''}</em></div>
+        <span class="wi-arrow" aria-hidden="true">→</span>
+        <div class="wi-side alt ${dRank > 0 ? 'up' : dRank < 0 ? 'down' : ''}"><span class="wi-k">What if</span><strong data-lk="wi:rec">${wiRec(me)}</strong><em>#${me.rank} of ${vm.N}${dRank ? ` <b>${dRank > 0 ? '▲' : '▼'} ${Math.abs(dRank)}</b>` : ''}${po ? ` · ${inPO(me.rank) ? 'in playoffs' : 'out of playoffs'}` : ''}</em></div>
+      </div>
+      <p class="wi-line">${edited ? `${edited} week${edited > 1 ? 's' : ''} changed · ${dPf >= 0 ? '+' : ''}${f1(dPf)} pts for the season` : 'No changes yet: pick a week below and swap in players from your bench.'}</p>
+      <p class="wi-fun">You left <strong>${f1(benchLeft)} pts</strong> on your bench this season. The perfect lineup every week would have made you <strong>${wiRec(bestAll.me)}</strong> (#${bestAll.me.rank}).</p>
+      <div class="wi-actions">
+        <button type="button" class="btn btn-ghost" data-wibest="all">✨ Best lineup every week</button>
+        ${edited ? '<button type="button" class="btn btn-ghost" data-wireset="all">Reset all</button>' : ''}
+      </div>
+    </section>`;
+
+  // 2. Weeks
+  const weekChip = x => {
+    const changed = !!st.edits[x.w];
+    const flip = x.real.res !== x.res ? (x.res === 'W' ? 'flip-up' : 'flip-down') : '';
+    return `<button type="button" class="wi-wk ${x.w === st.week ? 'on' : ''} ${flip}" data-wiweek="${x.w}" aria-pressed="${x.w === st.week}">
+      <span class="wi-wkn">Wk ${x.w}${changed ? '<i class="wi-dot" aria-label="changed"></i>' : ''}</span>
+      <span class="wi-wkr"><b class="r-${(x.real.res || '-').toLowerCase()}">${x.real.res || '–'}</b>${changed ? `<span>→</span><b class="r-${(x.res || '-').toLowerCase()}">${x.res || '–'}</b>` : ''}</span>
+    </button>`;
+  };
+  const weeksHtml = `<div class="wi-weeks" role="group" aria-label="Weeks">${res.weeks.map(weekChip).join('')}</div>`;
+
+  // 3. Week editor
+  const w = st.week;
+  const wk = W.week(w);
+  const cur = st.edits[w] || wk.starters;
+  const x = res.weeks.find(r => r.w === w);
+  const byId = new Map(wk.pool.map(p => [p.id, p]));
+  const inLineup = new Set(cur.filter(Boolean));
+  const bench = wk.pool.filter(p => !inLineup.has(p.id)).sort((a, b) => b.pts - a.pts);
+  const resTag = r => (r ? `<b class="wi-res r-${r.toLowerCase()}">${r}</b>` : '');
+  const opp = wk.oppTeam;
+  const slotRow = (slot, i) => {
+    const p = cur[i] ? byId.get(cur[i]) : null;
+    const was = wk.starters[i];
+    const realSet = new Set(wk.starters.filter(Boolean));
+    const swapped = !!cur[i] && !realSet.has(cur[i]);             // new starter from the bench
+    const moved = !!cur[i] && cur[i] !== was && realSet.has(cur[i]); // started anyway, other spot
+    const benched = was && !cur.includes(was) ? byId.get(was) : null;
+    const open = st.sel === i;
+    const elig = W.elig(slot);
+    const cands = open ? bench.filter(b => elig.includes(b.pos)) : [];
+    const label = SLOT_LABEL[slot] || slot;
+    return `<div class="wi-slot ${open ? 'open' : ''} ${swapped ? 'swapped' : ''}">
+      <button type="button" class="wi-srow" data-wislot="${i}" aria-expanded="${open}">
+        <span class="slot ${SLOT_LABEL[slot] ? 'slot-flex' : `slot-${slot}`}">${esc(label)}</span>
+        ${p ? playerAvatar(p.id, p.name, p.pos, 'sm') : '<span class="avatar sm" aria-hidden="true">–</span>'}
+        <span class="wi-pm"><span class="wi-pn">${p ? esc(p.name) : 'Empty'}</span><span class="wi-ps">${p ? `${esc(p.pos)} · ${esc(p.team || 'FA')}` : ''}${moved ? ' · moved here' : ''}${benched ? ` · <s>${esc(wiShort(benched.name))}</s>` : ''}</span></span>
+        <strong class="wi-pts">${p ? f1(p.pts) : '0.0'}</strong>
+        <span class="wi-swap" aria-hidden="true">${open ? '✕' : '⇄'}</span>
+      </button>
+      ${open ? `<div class="wi-cands">${cands.length ? cands.map(c => {
+        const d = c.pts - (p ? p.pts : 0);
+        return `<button type="button" class="wi-cand" data-wipick="${esc(c.id)}">
+          ${playerAvatar(c.id, c.name, c.pos, 'xs')}<span class="wi-cn">${esc(c.name)} <em>${esc(c.pos)}</em></span>
+          <span class="wi-cp">${f1(c.pts)}</span><span class="wi-cd ${d > 0 ? 'up' : d < 0 ? 'down' : ''}">${d > 0 ? '+' : d < 0 ? '−' : '±'}${f1(Math.abs(d))}</span>
+        </button>`;
+      }).join('') : '<p class="wi-none">No one on your bench that week can play this spot.</p>'}</div>` : ''}
+    </div>`;
+  };
+  const editor = `
+    <section class="card wi-editor">
+      <header class="wi-eh">
+        <div><h3>Week ${w}</h3><p>${opp ? `vs ${esc(opp.name)}` : 'No opponent'}</p></div>
+        <div class="wi-ebtn">
+          <button type="button" class="btn btn-ghost" data-wibest="${w}">Best lineup</button>
+          ${st.edits[w] ? `<button type="button" class="btn btn-ghost" data-wireset="${w}">Reset</button>` : ''}
+        </div>
+      </header>
+      <div class="wi-score">
+        <div><span>Real</span><strong>${f1(x.real.my)}</strong>${x.op != null ? `<em>vs ${f1(x.op)}</em>` : ''}${resTag(x.real.res)}</div>
+        <div class="alt"><span>What if</span><strong data-lk="wi:w${w}">${f1(x.my)}</strong>${x.op != null ? `<em>vs ${f1(x.op)}</em>` : ''}${resTag(x.res)}</div>
+      </div>
+      ${W.medianGame && x.med != null ? `<p class="wi-med">Median game: ${f1(x.med)} pts → real ${x.real.medRes}, what if ${x.medRes}</p>` : ''}
+      <p class="wi-hint">Tap a spot to swap in someone from your bench.</p>
+      <div class="wi-lineup">${W.slots.map(slotRow).join('')}</div>
+      ${bench.length ? `<h4 class="wi-bh">Bench that week</h4><div class="wi-bench">${bench.map(b => `<span class="wi-bp">${playerAvatar(b.id, b.name, b.pos, 'xs')}${esc(wiShort(b.name))} <em>${esc(b.pos)}</em><b>${f1(b.pts)}</b></span>`).join('')}</div>` : ''}
+    </section>`;
+
+  // 4. What-if standings
+  const rows = res.rows.map(r => {
+    const d = r.real.rank - r.rank;
+    const recChanged = r.wins !== r.real.wins || r.losses !== r.real.losses || r.ties !== r.real.ties;
+    const mine = r.team.rosterId === vm.me.rosterId;
+    return `<div class="wi-row ${mine ? 'mine' : ''} ${po && r.rank === po ? 'po-line' : ''}">
+      <span class="wi-rk">${r.rank}</span>
+      <span class="wi-mv ${d > 0 ? 'up' : d < 0 ? 'down' : ''}">${d > 0 ? `▲${d}` : d < 0 ? `▼${-d}` : '–'}</span>
+      ${avatarHtml(r.team.avatar, r.team.name)}
+      <span class="wi-tn">${esc(r.team.name)}${mine ? ' <span class="you">You</span>' : ''}</span>
+      <span class="wi-rec">${recChanged ? `<s>${wiRec(r.real)}</s> ` : ''}<strong>${wiRec(r)}</strong></span>
+      <span class="wi-pf hide-sm">${f1(r.pf)}</span>
+    </div>`;
+  }).join('');
+  const table = `
+    <section class="card wi-table">
+      <header class="wi-th"><h3>What-if standings</h3><p>${edited ? 'Your changes also flip your opponents’ results.' : 'Same as the real table until you change a week.'}${po ? ` Top ${po} make the playoffs.` : ''}</p></header>
+      <div class="wi-row head"><span class="wi-rk">#</span><span class="wi-mv"></span><span></span><span class="wi-tn">Team</span><span class="wi-rec">Record</span><span class="wi-pf hide-sm">PF</span></div>
+      ${rows}
+    </section>`;
+
+  body.innerHTML = `${hero}${weeksHtml}<div class="wi-grid">${editor}${table}</div>`;
+  const on = body.querySelector('.wi-wk.on');
+  if (on) { const box = on.parentElement; box.scrollLeft = on.offsetLeft - box.clientWidth / 2 + on.offsetWidth / 2; }
+  flashChanges();
+}
+
+function wiApply(fn) {
+  const st = wiState();
+  fn(st);
+  wiSave();
+  document.documentElement.classList.add('settled');
+  if (ui.vm) renderWhatIf(ui.vm);
+}
+
 /* ---------- My Team ---------- */
 const SLOT_LABEL = { FLEX: 'FLEX', SUPER_FLEX: 'SF', REC_FLEX: 'W/T', WRRB_FLEX: 'W/R', IDP_FLEX: 'IDP' };
 
 function renderMyTeam(vm) {
   const view = ui.teamView;
-  const seg = [['roster', 'Roster'], ['startsit', 'Start / Sit'], ['stats', 'Season stats']]
+  const seg = [['roster', 'Roster'], ['startsit', 'Start / Sit'], ['stats', '<span class="hide-sm">Season </span>Stats'], ['whatif', 'What If']]
     .map(([k, l]) => `<button type="button" class="chip" data-tview="${k}" aria-pressed="${k === view}">${l}</button>`).join('');
+  const sub = { roster: 'Your lineup, this week and all season. Tap a player for details.', startsit: 'Not sure who to play? Compare players for any week.',
+    stats: `${esc(vm.me.name)}'s season in numbers.`, whatif: 'Change who you started in any week and see how the standings would look right now.' }[view];
   $('#panel-team').innerHTML = `
     <div class="section-head">
-      <div><h2>My Team</h2><p>${view === 'roster' ? 'Your lineup, this week and all season. Tap a player for details.' : view === 'startsit' ? 'Not sure who to play? Compare players for any week.' : `${esc(vm.me.name)}'s season in numbers.`}</p></div>
+      <div><h2>My Team</h2><p>${sub}</p></div>
       <div class="chips seg" role="group" aria-label="My Team view">${seg}</div>
     </div>
     <div id="teamBody"></div>`;
-  if (view === 'roster') renderRoster(vm); else if (view === 'startsit') renderStartSit(vm); else renderTeamStats(vm);
+  if (view === 'roster') renderRoster(vm); else if (view === 'startsit') renderStartSit(vm); else if (view === 'whatif') renderWhatIf(vm); else renderTeamStats(vm);
 }
 
 function rosterRow(p, slot, i) {
@@ -6827,7 +7190,7 @@ function liveRender(vm) {
   renderTeamHeader(vm);
   renderOverview(vm);
   renderMatchups(vm);
-  if (ui.teamView !== 'startsit' && !typingIn('#panel-team')) renderMyTeam(vm);
+  if (!['startsit', 'whatif'].includes(ui.teamView) && !typingIn('#panel-team')) renderMyTeam(vm);
   if (!typingIn('#panel-league')) renderLeague(vm);
   renderDebug(vm);
   $$('.panel').forEach(p => { p.hidden = p.id !== `panel-${ui.tab}`; });
@@ -7066,6 +7429,37 @@ $('main').addEventListener('click', e => {
     $('#evalBox')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     return;
   }
+  const wiw = e.target.closest('[data-wiweek]');
+  if (wiw && ui.vm) { wiApply(st => { st.week = Number(wiw.dataset.wiweek); st.sel = null; }); return; }
+  const wis = e.target.closest('[data-wislot]');
+  if (wis && ui.vm) { const i = Number(wis.dataset.wislot); wiApply(st => { st.sel = st.sel === i ? null : i; }); return; }
+  const wip = e.target.closest('[data-wipick]');
+  if (wip && ui.vm) {
+    const W = ui.vm.whatIf;
+    wiApply(st => {
+      const wk = W.week(st.week);
+      const next = [...(st.edits[st.week] || wk.starters)];
+      next[st.sel] = wip.dataset.wipick;
+      if (next.every((id, k) => (id || null) === (wk.starters[k] || null))) delete st.edits[st.week]; else st.edits[st.week] = next;
+      st.sel = null;
+    });
+    return;
+  }
+  const wib = e.target.closest('[data-wibest]');
+  if (wib && ui.vm) {
+    const W = ui.vm.whatIf;
+    wiApply(st => {
+      const weeks = wib.dataset.wibest === 'all' ? W.weeks : [Number(wib.dataset.wibest)];
+      for (const w of weeks) {
+        const wk = W.week(w), best = W.best(wk);
+        if (best.every((id, k) => (id || null) === (wk.starters[k] || null))) delete st.edits[w]; else st.edits[w] = best;
+      }
+      st.sel = null;
+    });
+    return;
+  }
+  const wir = e.target.closest('[data-wireset]');
+  if (wir && ui.vm) { wiApply(st => { if (wir.dataset.wireset === 'all') st.edits = {}; else delete st.edits[Number(wir.dataset.wireset)]; st.sel = null; }); return; }
   const plp = e.target.closest('[data-plpos]');
   if (plp && ui.vm) { ui.pl.pos = plp.dataset.plpos; renderLeague(ui.vm); return; }
   const pls = e.target.closest('[data-plsort]');
