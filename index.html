@@ -530,6 +530,8 @@ body.sheet-open { overflow: hidden; }
 .lt-name { font-weight: 600; overflow-wrap: anywhere; }
 .lt-sub { font-size: 12.5px; color: var(--muted); margin-top: 1px; overflow-wrap: anywhere; }
 .lt-unit { font-size: 11.5px; color: var(--muted); }
+.lt-unit.pf-add { color: var(--good); font-weight: 600; white-space: nowrap; }
+td.r .lt-unit { white-space: nowrap; }
 .you { display: inline-flex; align-items: center; height: 18px; padding: 0 6px; border-radius: 5px; font-size: 10.5px; font-weight: 700; color: var(--accent); background: #fff; border: 1px solid #D5DFFC; vertical-align: 1px; margin-left: 4px; }
 .streak { display: inline-flex; min-width: 30px; justify-content: center; height: 22px; align-items: center; padding: 0 6px; border-radius: 6px; font-size: 12px; font-weight: 700; }
 .streak.s-W { color: var(--good); background: var(--good-bg); }
@@ -6397,7 +6399,7 @@ function renderLeague(vm) {
     }).sort((a, b) => a.rank - b.rank);
     const po = vm.playoffTeams;
     head = liveMap
-      ? '<th class="c-rk">#</th><th>Team</th><th class="r">Record</th><th class="r hide-sm">PF</th><th class="r hide-sm">This week</th>'
+      ? `<th class="c-rk">#</th><th>Team</th><th class="r">Record</th><th class="r" title="Points for, including this week's ${mode === 'now' ? 'live' : 'projected'} score">PF</th><th class="r hide-sm">This week</th>`
       : '<th class="c-rk">#</th><th>Team</th><th class="r">Record</th><th class="r">PF</th><th class="r hide-sm">PA</th><th class="r hide-sm">Streak</th>';
     rows = rowsData.map(({ r, L, rank, rec: rr, pf }) => {
       const move = L ? r.team.rank - L.rank : 0;
@@ -6411,14 +6413,14 @@ function renderLeague(vm) {
         <td class="c-rk"><span class="rk">${rank}</span>${moveTag}</td>
         <td>${teamCell(r, liveMap ? `<span class="hide-sm">@${esc(r.team.owner)}</span><span class="show-sm">${weekLine}</span>` : `@${esc(r.team.owner)}`)}</td>
         <td class="r num">${rec(rr)}${L && !r.team.alreadyCounted ? `<div class="lt-unit">was ${rec(r.team)}</div>` : ''}</td>
-        <td class="r num ${liveMap ? 'hide-sm' : ''}">${f1(pf)}</td>
+        <td class="r num"><span data-lk="pf:${r.team.rosterId}">${f1(pf)}</span>${L && !r.team.alreadyCounted && L.my != null ? `<div class="lt-unit pf-add">+${f1(L.my)} ${mode === 'now' ? 'live' : 'proj'}</div>` : ''}</td>
         ${liveMap
           ? `<td class="r hide-sm wk-cell">${weekLine}${L && L.oppName ? `<div class="lt-unit">vs ${esc(L.oppName)}</div>` : ''}</td>`
           : `<td class="r num hide-sm">${f1(r.team.pa)}</td><td class="r hide-sm">${r.streak ? `<span class="streak s-${r.streak[0]}">${r.streak}</span>` : '—'}</td>`}
       </tr>`;
     }).join('');
     note = [
-      liveMap ? 'Arrows show how many places each team would move from the official standings.' : 'PF = points for, PA = points against.',
+      liveMap ? `Arrows show how many places each team would move from the official standings. PF = points for, including this week's ${mode === 'now' ? 'live' : 'projected'} score.` : 'PF = points for, PA = points against.',
       po ? `The line marks the playoff cut (top ${po}).` : '',
       vm.liveStandings?.medianGame ? 'Your league also plays everyone against the weekly median, so each week counts as two results.' : '',
       liveMap ? 'Updates live every 15 seconds while games are on.' : '',
