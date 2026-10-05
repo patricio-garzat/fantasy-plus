@@ -1686,6 +1686,66 @@ html:not([data-theme="light"]) .wi-row.mine { background: rgba(99,102,241,.14); 
 html:not([data-theme="light"]) .wi-slot.swapped .wi-srow { background: rgba(99,102,241,.12); }
 html:not([data-theme="light"]) .wi-cand:hover { background: rgba(255,255,255,.05); }
 
+/* Rankings by position */
+.pm-bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 16px; margin-bottom: 12px; }
+.pm-bar .chip { white-space: nowrap; }
+.pm-legend { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; color: var(--muted); }
+.pm-card { overflow: hidden; }
+.pm-table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+.pm-table th, .pm-table td { padding: 8px 4px; border-bottom: 1px solid var(--border-2); }
+.pm-table thead th { font-size: 12px; font-weight: 600; color: var(--muted); text-align: center; }
+.pm-team-h { text-align: left !important; width: 36%; padding-left: 16px !important; }
+.pm-h button { border: 0; background: none; padding: 4px 2px; font: inherit; font-weight: 700; color: var(--muted); cursor: pointer; border-radius: 6px; }
+.pm-h button:hover, .pm-h.on button { color: var(--text); }
+.pm-h.on button { text-decoration: underline; text-underline-offset: 4px; }
+.pm-h button:focus-visible, .pm-clear:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.pm-clear { margin-left: 6px; border: 0; background: none; padding: 0; font: inherit; font-size: 11px; color: var(--accent); cursor: pointer; }
+.pm-r { cursor: default; }
+.pm-r[data-pmopen] { cursor: pointer; }
+.pm-r[data-pmopen]:hover { background: var(--surface-2); }
+.pm-r.me { background: var(--accent-soft); }
+.pm-team { display: flex; align-items: center; gap: 10px; min-width: 0; padding-left: 16px !important; }
+.pm-team .avatar { width: 28px; height: 28px; font-size: 10px; flex: none; }
+.pm-tn { min-width: 0; flex: 1; font-weight: 600; font-size: 13.5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pm-caret { color: var(--muted); font-size: 14px; transition: transform .2s ease; }
+.pm-r.open .pm-caret { transform: rotate(180deg); }
+.pm-c { text-align: center; }
+.pm-c.sorted { background: rgba(99,102,241,.06); }
+.pm-b { display: inline-flex; align-items: center; justify-content: center; min-width: 26px; height: 24px; padding: 0 5px; border-radius: 7px; font-size: 12.5px; font-weight: 800; font-variant-numeric: tabular-nums; }
+.pm-b.t-hi { color: var(--good); background: var(--good-bg); }
+.pm-b.t-mid { color: var(--text-2); background: var(--neutral-bg); }
+.pm-b.t-lo { color: var(--bad); background: var(--bad-bg); }
+.pm-v { display: block; margin-top: 2px; font-size: 10.5px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.pm-av { font-size: 13px; font-weight: 700; font-variant-numeric: tabular-nums; color: var(--text-2); }
+.pm-detail td { padding: 4px 16px 14px; background: var(--surface-2); }
+.pm-dgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 10px 18px; animation: rise .2s var(--ease) both; }
+.pm-dh { display: flex; align-items: center; gap: 6px; margin-bottom: 3px; }
+.pm-dh .pm-b { min-width: 0; height: 20px; font-size: 11px; }
+.pm-lbl { font-size: 11.5px; color: var(--muted); }
+.pm-dn { font-size: 13px; line-height: 1.5; }
+.pm-dn em, .pm-bn em { font-style: normal; font-size: 11.5px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.pm-bn { font-size: 12px; color: var(--text-2); }
+@media (max-width: 640px) {
+  .pm-table th, .pm-table td { padding: 7px 1px; }
+  .pm-team-h { width: 30%; padding-left: 10px !important; }
+  .pm-team { padding-left: 10px !important; gap: 6px; }
+  .pm-team .avatar { display: none; }
+  .pm-tn { font-size: 12.5px; }
+  .pm-caret { display: none; }
+  .pm-v { display: none; }
+  .pm-b { min-width: 22px; height: 22px; padding: 0 3px; font-size: 11.5px; }
+  .pm-h button { font-size: 11px; padding: 4px 0; }
+  .pm-av { font-size: 11.5px; }
+  .pm-detail td { padding: 4px 10px 12px; }
+  .pm-legend { font-size: 11px; }
+}
+html:not([data-theme="light"]) .pm-b.t-hi { color: #6EE7B7; background: rgba(52,211,153,.14); }
+html:not([data-theme="light"]) .pm-b.t-lo { color: #FCA5A5; background: rgba(248,113,113,.14); }
+html:not([data-theme="light"]) .pm-b.t-mid { background: rgba(255,255,255,.06); }
+html:not([data-theme="light"]) .pm-r.me { background: rgba(99,102,241,.14); }
+html:not([data-theme="light"]) .pm-r[data-pmopen]:hover { background: rgba(255,255,255,.03); }
+html:not([data-theme="light"]) .pm-detail td { background: rgba(255,255,255,.025); }
+
 /* League players */
 .pl-filters { padding: 16px 18px; }
 .pl-pos { gap: 6px; }
@@ -4210,6 +4270,22 @@ function buildViewModel(raw, myRosterId) {
     });
   const meRow = leagueRows.find(r => r.team.rosterId === me.rosterId);
 
+  /* ---- Every team × every position: roster strength rank and points-scored rank ---- */
+  const rankAmong = (vals, v) => vals.filter(x => x > v + 1e-9).length + 1;
+  const posMatrix = {
+    cats: hasSignal ? cfg.cats : [],
+    strength: Object.fromEntries(teams.map(t => [t.rosterId, Object.fromEntries((hasSignal ? gradesByTeam[t.rosterId] : []).map(g => [g.pos, {
+      rank: g.rank, value: g.starter, depthRank: g.rankDepth, label: gradeLabel(g),
+      starters: (g.starters || []).map(x => ({ id: x.id, v: x.v })), bench: (g.bench || []).slice(0, 2).map(x => ({ id: x.id, v: x.v })),
+    }]))])),
+    scoredCats: posPoints.map(x => x.pos),
+    scored: Object.fromEntries(teams.map(t => [t.rosterId, Object.fromEntries(posPoints.map(x => {
+      const all = teams.map(o => perWeek(o.rosterId, x.pos));
+      const v = perWeek(t.rosterId, x.pos);
+      return [x.pos, { rank: rankAmong(all, v), value: v }];
+    }))])),
+  };
+
   /* ---- Start / Sit: searchable players + a sensible first comparison ---- */
   const mine = new Set([...me.players, ...me.reserve, ...me.taxi]);
   const searchPlayers = Object.entries(players)
@@ -4291,7 +4367,7 @@ function buildViewModel(raw, myRosterId) {
 
   return {
     rosterOf, myOppId, liveStat, rosteredPlayers, whatIf, ppgAny, newsOf, opportunityOf, adjValue, liveGameOf: team => liveGames?.[team] || null, seasonStatsMissing, scoreStats,
-    league, state, timeline, teams, me, N, cfg, ptsKey, leagueRows, lineup, posPoints, meRow,
+    league, state, timeline, teams, me, N, cfg, ptsKey, leagueRows, lineup, posPoints, meRow, posMatrix,
     liveStandings, playoffTeams: league.settings?.playoff_teams || null, matchupWeeks, buildMatchups,
     searchPlayers, startSitDefault, allowRank, statWeeksUsed: statWeeks, usageOf, lineFor, lines: lines || {},
     evaluateMove, evaluateTrade, freeAgents, dropOptions, suggestDrop, openSpots,
@@ -4388,6 +4464,10 @@ const ui = {
   nflWeek: null,
   nflOpen: new Set(),
   nflErr: new Map(),
+  rankMode: 'overall',
+  pmMetric: 'strength',
+  pmSort: null,
+  pmOpen: null,
   wvView: 'wire',
   dc: { team: null, q: '', hl: null, err: null },
   pl: { pos: 'All', week: null, min: 0, owner: 'all', q: '', sort: 'pts' },
@@ -6441,9 +6521,13 @@ function renderLeague(vm) {
         <td class="r num hide-sm">#${r.rosterRank}</td>
       </tr>`).join('');
     note = 'Power = 40% roster strength + 35% all-play record + 25% points per game. All-play = your record if you played every team every week. "Lucky" and "Unlucky" mark teams whose record is well above or below their all-play record.';
+  } else if (ui.rankMode === 'pos') {
+    renderPosMatrix(vm, seg);
+    return;
   } else {
     title = 'Roster Rankings';
     subtitle = 'Who has the best players, regardless of the points already scored.';
+    toolbar = rankModes();
     const list = [...vm.leagueRows].sort((a, b) => a.rosterRank - b.rosterRank);
     head = '<th class="c-rk">#</th><th>Team</th><th class="r">Roster score</th><th class="r hide-sm">Best lineup</th><th class="r hide-sm">Depth</th><th class="hide-sm">Strongest</th><th class="hide-sm">Weakest</th>';
     const posRank = g => (g ? `${posTag(g.pos)} <span class="muted">${ordinal(g.rank)}</span>` : '—');
@@ -6470,6 +6554,79 @@ function renderLeague(vm) {
       <table class="ltable"><thead><tr>${head}</tr></thead><tbody>${rows}</tbody></table>
     </section>
     <p class="method-note">${note}</p>`;
+}
+
+/* ---------- League → Ranks → By position: every team's rank at every position ---------- */
+const rankModes = () => `<div class="stand-modes" role="group" aria-label="Rankings view">${[['overall', 'Overall'], ['pos', 'By position']]
+  .map(([k, l]) => `<button type="button" class="smode${ui.rankMode === k ? ' on' : ''}" data-rankmode="${k}" aria-pressed="${ui.rankMode === k}">${l}</button>`).join('')}</div>`;
+
+function renderPosMatrix(vm, seg) {
+  const M = vm.posMatrix;
+  const metric = ui.pmMetric === 'scored' && M.scoredCats.length ? 'scored' : 'strength';
+  const cats = metric === 'scored' ? M.scoredCats : M.cats;
+  const data = M[metric];
+  const N = vm.N;
+  const meId = vm.me.rosterId;
+  if (!cats.length) {
+    $('#panel-league').innerHTML = `<div class="section-head"><div><h2>Rankings by position</h2></div><div class="chips seg" role="group" aria-label="League view">${seg}</div></div>${rankModes()}
+      <div class="card notice"><strong>Not enough data yet</strong>Position rankings appear once there are player stats or projections.</div>`;
+    return;
+  }
+  if (ui.pmSort && !cats.includes(ui.pmSort)) ui.pmSort = null;
+  const avgRank = rid => sum(cats.map(c => data[rid]?.[c]?.rank || N)) / cats.length;
+  const teams = [...vm.teams].sort((a, b) => ui.pmSort
+    ? (data[a.rosterId]?.[ui.pmSort]?.rank || N) - (data[b.rosterId]?.[ui.pmSort]?.rank || N)
+    : avgRank(a.rosterId) - avgRank(b.rosterId));
+  // Heat: top third green, bottom third red, middle neutral (rank number always shown, so color is never the only cue).
+  const tone = r => (r <= Math.ceil(N / 3) ? 'hi' : r > N - Math.ceil(N / 3) ? 'lo' : 'mid');
+  const cell = (rid, c) => {
+    const x = data[rid]?.[c];
+    if (!x) return '<td class="pm-c">—</td>';
+    return `<td class="pm-c ${ui.pmSort === c ? 'sorted' : ''}"><span class="pm-b t-${tone(x.rank)}" title="${esc(c)}: ${ordinal(x.rank)} of ${N}${x.value != null ? ` · ${f1(x.value)} pts/wk` : ''}">${x.rank}</span><span class="pm-v">${f1(x.value)}</span></td>`;
+  };
+  const detail = rid => {
+    if (metric !== 'strength') return '';
+    const d = data[rid] || {};
+    return `<tr class="pm-detail"><td colspan="${cats.length + 2}"><div class="pm-dgrid">${cats.map(c => {
+      const x = d[c];
+      if (!x) return '';
+      const names = x.starters.map(s => `${plink(s.id, vm.playerInfo(s.id).name)} <em>${f1(s.v)}</em>`).join(', ') || '<span class="muted">Empty</span>';
+      const bn = x.bench.length ? `<div class="pm-bn">Bench: ${x.bench.map(s => `${plink(s.id, vm.playerInfo(s.id).name)} <em>${f1(s.v)}</em>`).join(', ')}</div>` : '';
+      return `<div class="pm-dc"><div class="pm-dh">${posTag(c === 'FLEX' ? 'FLEX' : c)}<span class="pm-b t-${tone(x.rank)}">${ordinal(x.rank)}</span><span class="pm-lbl">${esc(x.label)}</span></div><div class="pm-dn">${names}</div>${bn}</div>`;
+    }).join('')}</div></td></tr>`;
+  };
+  const rows = teams.map((t, i) => {
+    const open = ui.pmOpen === t.rosterId;
+    return `<tr class="pm-r ${t.rosterId === meId ? 'me' : ''} ${open ? 'open' : ''}" ${metric === 'strength' ? `data-pmopen="${t.rosterId}"` : ''}>
+      <td class="pm-team">${avatarHtml(t.avatar, t.name)}<span class="pm-tn">${esc(t.name)}${t.rosterId === meId ? ' <span class="you">You</span>' : ''}</span>${metric === 'strength' ? `<span class="pm-caret" aria-hidden="true">⌄</span>` : ''}</td>
+      <td class="pm-c pm-avg"><span class="pm-av">${f1(avgRank(t.rosterId))}</span></td>
+      ${cats.map(c => cell(t.rosterId, c)).join('')}
+    </tr>${open ? detail(t.rosterId) : ''}`;
+  }).join('');
+  const sortBtn = c => `<th class="pm-h ${ui.pmSort === c ? 'on' : ''}"><button type="button" data-pmsort="${esc(c)}" aria-pressed="${ui.pmSort === c}" title="Sort by ${esc(c)}">${esc(c === 'FLEX' ? 'FLX' : c)}</button></th>`;
+
+  $('#panel-league').innerHTML = `
+    <div class="section-head">
+      <div><h2>Rankings by position</h2><p>How every team in your league ranks at each position (1 = best of ${N}).</p></div>
+      <div class="chips seg" role="group" aria-label="League view">${seg}</div>
+    </div>
+    ${rankModes()}
+    <div class="pm-bar">
+      <div class="chips" role="group" aria-label="Ranking basis">
+        <button type="button" class="chip" data-pmmetric="strength" aria-pressed="${metric === 'strength'}">Roster strength</button>
+        ${M.scoredCats.length ? `<button type="button" class="chip" data-pmmetric="scored" aria-pressed="${metric === 'scored'}">Points scored</button>` : ''}
+      </div>
+      <span class="pm-legend"><span class="pm-b t-hi">1</span> top third <span class="pm-b t-mid">6</span> middle <span class="pm-b t-lo">12</span> bottom third</span>
+    </div>
+    <section class="card reveal pm-card">
+      <table class="pm-table">
+        <thead><tr><th class="pm-team-h">Team${ui.pmSort ? ` <button type="button" class="pm-clear" data-pmsort="">Sort by avg</button>` : ''}</th><th class="pm-h"><button type="button" data-pmsort="" aria-pressed="${!ui.pmSort}" title="Average rank">Avg</button></th>${cats.map(sortBtn).join('')}</tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </section>
+    <p class="method-note">${metric === 'strength'
+      ? 'Roster strength ranks the players each team has right now: its best starters at the position plus bench depth, valued by points per game in your league blended with projections. Small number under each rank = starters’ pts/week. Tap a team to see who drives each rank. Tap a position to sort.'
+      : 'Points scored ranks the points each team’s starters actually produced at each position, per week, this season. Tap a position to sort.'}</p>`;
 }
 
 /* ---------- Live in-game stats ---------- */
@@ -7462,6 +7619,14 @@ $('main').addEventListener('click', e => {
   }
   const wir = e.target.closest('[data-wireset]');
   if (wir && ui.vm) { wiApply(st => { if (wir.dataset.wireset === 'all') st.edits = {}; else delete st.edits[Number(wir.dataset.wireset)]; st.sel = null; }); return; }
+  const rkm = e.target.closest('[data-rankmode]');
+  if (rkm && ui.vm) { ui.rankMode = rkm.dataset.rankmode; renderLeague(ui.vm); return; }
+  const pmm = e.target.closest('[data-pmmetric]');
+  if (pmm && ui.vm) { ui.pmMetric = pmm.dataset.pmmetric; ui.pmOpen = null; renderLeague(ui.vm); return; }
+  const pms = e.target.closest('[data-pmsort]');
+  if (pms && ui.vm) { ui.pmSort = pms.dataset.pmsort || null; renderLeague(ui.vm); return; }
+  const pmo = e.target.closest('[data-pmopen]');
+  if (pmo && ui.vm && !e.target.closest('.pl-link')) { const id = Number(pmo.dataset.pmopen); ui.pmOpen = ui.pmOpen === id ? null : id; document.documentElement.classList.add('settled'); renderLeague(ui.vm); return; }
   const plp = e.target.closest('[data-plpos]');
   if (plp && ui.vm) { ui.pl.pos = plp.dataset.plpos; renderLeague(ui.vm); return; }
   const pls = e.target.closest('[data-plsort]');
