@@ -1585,6 +1585,9 @@ html:not([data-theme="light"]) .dc-row.hl { background: rgba(99,102,241,.16); bo
 .wi-side.alt.up em b, .wi-side.alt.up strong { color: var(--good); }
 .wi-side.alt.down em b, .wi-side.alt.down strong { color: var(--bad); }
 .wi-arrow { font-size: 26px; color: var(--muted); }
+.wi-others { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; margin-top: 14px; }
+.wi-others .stand-modes { margin: 0; }
+.wi-others .smode { height: 32px; padding: 0 12px; }
 .wi-line { margin-top: 12px; font-size: 14px; font-weight: 600; }
 .wi-fun { margin-top: 4px; font-size: 13px; color: var(--text-2); }
 .wi-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
@@ -4148,13 +4151,31 @@ function buildViewModel(raw, myRosterId) {
     }
     return rest.length ? out : aligned;
   };
+  /** Any team's best possible score that week (same rules as wiBest: restrictive slots first). */
+  const bestScoreCache = new Map();
+  const bestScore = (w, m) => {
+    const key = `${w}:${m.roster_id}`;
+    if (bestScoreCache.has(key)) return bestScoreCache.get(key);
+    const ptsOf = pid => m.players_points?.[pid] ?? 0;
+    const pool = [...new Set([...(m.players || []), ...(m.starters || [])])].filter(pid => pid && pid !== '0').map(pid => ({ id: pid, pos: posOf(pid), pts: ptsOf(pid) }));
+    const used = new Set();
+    let best = 0;
+    slotNames.map(sl => sl).sort((a, b) => slotElig(a).length - slotElig(b).length).forEach(sl => {
+      const c = pool.filter(p => !used.has(p.id) && slotElig(sl).includes(p.pos)).sort((a, b) => b.pts - a.pts)[0];
+      if (c) { best += c.pts; used.add(c.id); }
+    });
+    const real = sum((m.starters || []).filter(pid => pid && pid !== '0').map(ptsOf));
+    const out = r2((m.points || 0) + best - real);
+    bestScoreCache.set(key, out);
+    return out;
+  };
   /** Every week's scores (with your edits), replayed into wins, losses and points for all teams. */
-  const wiReplay = edits => {
+  const wiReplay = (edits, othersBest = false) => {
     const rec = new Map(teams.map(t => [t.rosterId, { wins: 0, losses: 0, ties: 0, pf: 0 }]));
     const mine = [];
     for (const w of wiWeeks) {
       const list = wiList(w);
-      const scores = Object.fromEntries(list.map(m => [m.roster_id, m.points || 0]));
+      const scores = Object.fromEntries(list.map(m => [m.roster_id, othersBest && m.roster_id !== me.rosterId ? bestScore(w, m) : m.points || 0]));
       const wk = wiWeek(w);
       if (edits?.[w]) scores[me.rosterId] = wiPoints(wk, edits[w]);
       const med = medianGame ? median(Object.values(scores)) : null;
@@ -4166,15 +4187,18 @@ function buildViewModel(raw, myRosterId) {
         r.pf += scores[m.roster_id];
       }
       const my = scores[me.rosterId];
-      mine.push({ w, my, op: wk.oppPts, med, res: wk.oppPts == null ? null : my > wk.oppPts ? 'W' : my < wk.oppPts ? 'L' : 'T',
+      const myM = list.find(m => m.roster_id === me.rosterId);
+      const oppM = myM ? oppOf(list, myM) : null;
+      const op = oppM ? scores[oppM.roster_id] : null;
+      mine.push({ w, my, op, med, res: op == null ? null : my > op ? 'W' : my < op ? 'L' : 'T',
         medRes: med == null ? null : my > med ? 'W' : my < med ? 'L' : 'T' });
     }
     return { rec, mine };
   };
   const wiBase = wiReplay(null);
   /** Standings if your lineups had been `edits` ({ week: [pid per slot] }), anchored to the official table. */
-  const whatIfRun = edits => {
-    const alt = wiReplay(edits);
+  const whatIfRun = (edits, othersBest = false) => {
+    const alt = wiReplay(edits, othersBest);
     const rows = teams.map(t => {
       const b = wiBase.rec.get(t.rosterId), a = alt.rec.get(t.rosterId);
       return { team: t, real: { wins: t.wins, losses: t.losses, ties: t.ties, pf: t.pf, rank: t.rank },
@@ -5048,13 +5072,14 @@ function wiState() {
   if (!ui.wi || ui.wi.key !== wiKey()) {
     let edits = {};
     try { edits = JSON.parse(store.get(wiKey()) || '{}') || {}; } catch { edits = {}; }
-    ui.wi = { key: wiKey(), edits, week: null, sel: null };
+    ui.wi = { key: wiKey(), edits, week: null, sel: null, others: store.get(`${wiKey()}_o`) === 'best' ? 'best' : 'real' };
   }
   return ui.wi;
 }
 function wiSave() {
   const st = ui.wi;
   if (Object.keys(st.edits).length) store.set(st.key, JSON.stringify(st.edits)); else store.del(st.key);
+  if (st.others === 'best') store.set(`${st.key}_o`, 'best'); else store.del(`${st.key}_o`);
 }
 const wiRec = r => `${r.wins}-${r.losses}${r.ties ? '-' + r.ties : ''}`;
 const wiShort = nm => { const p = String(nm).split(' '); return p.length > 1 && p[0].length > 2 ? `${p[0][0]}. ${p.slice(1).join(' ')}` : nm; };
@@ -5067,10 +5092,13 @@ function renderWhatIf(vm) {
   // Drop edits for weeks that no longer exist or no longer fit the roster slots.
   for (const w of Object.keys(st.edits)) if (!W.weeks.includes(Number(w)) || st.edits[w].length !== W.slots.length) delete st.edits[w];
   if (!W.weeks.includes(st.week)) st.week = W.weeks[W.weeks.length - 1];
-  const res = W.run(st.edits);
+  const othersBest = st.others === 'best';
+  const res = W.run(st.edits, othersBest);
   const me = res.me;
   const edited = Object.keys(st.edits).length;
-  const bestAll = W.run(Object.fromEntries(W.weeks.map(w => [w, W.best(W.week(w))])));
+  const allMine = Object.fromEntries(W.weeks.map(w => [w, W.best(W.week(w))]));
+  const bestAll = W.run(allMine);
+  const bestBoth = W.run(allMine, true);
   const benchLeft = sum(W.weeks.map(w => { const wk = W.week(w); return W.points(wk, W.best(wk)) - wk.realPts; }));
   const po = W.playoffTeams;
   const inPO = rank => po && rank <= po;
@@ -5085,11 +5113,19 @@ function renderWhatIf(vm) {
         <span class="wi-arrow" aria-hidden="true">→</span>
         <div class="wi-side alt ${dRank > 0 ? 'up' : dRank < 0 ? 'down' : ''}"><span class="wi-k">What if</span><strong data-lk="wi:rec">${wiRec(me)}</strong><em>#${me.rank} of ${vm.N}${dRank ? ` <b>${dRank > 0 ? '▲' : '▼'} ${Math.abs(dRank)}</b>` : ''}${po ? ` · ${inPO(me.rank) ? 'in playoffs' : 'out of playoffs'}` : ''}</em></div>
       </div>
-      <p class="wi-line">${edited ? `${edited} week${edited > 1 ? 's' : ''} changed · ${dPf >= 0 ? '+' : ''}${f1(dPf)} pts for the season` : 'No changes yet: pick a week below and swap in players from your bench.'}</p>
-      <p class="wi-fun">You left <strong>${f1(benchLeft)} pts</strong> on your bench this season. The perfect lineup every week would have made you <strong>${wiRec(bestAll.me)}</strong> (#${bestAll.me.rank}).</p>
+      <div class="wi-others">
+        <span class="wi-k">Other teams</span>
+        <div class="stand-modes" role="group" aria-label="Other teams' lineups">
+          <button type="button" class="smode${othersBest ? '' : ' on'}" data-wiothers="real" aria-pressed="${!othersBest}">As they played</button>
+          <button type="button" class="smode${othersBest ? ' on' : ''}" data-wiothers="best" aria-pressed="${othersBest}">Their best lineup</button>
+        </div>
+      </div>
+      <p class="wi-line">${edited ? `${edited} week${edited > 1 ? 's' : ''} changed · ${dPf >= 0 ? '+' : ''}${f1(dPf)} pts for the season` : 'Your lineups: as you played them. Pick a week below and swap in players from your bench.'}${othersBest ? ' · every other team plays its best possible lineup each week' : ''}</p>
+      <p class="wi-fun">You left <strong>${f1(benchLeft)} pts</strong> on your bench this season. The perfect lineup every week would have made you <strong>${wiRec(bestAll.me)}</strong> (#${bestAll.me.rank}). If <em>every</em> team had played its best lineup, you’d be <strong>${wiRec(bestBoth.me)}</strong> (#${bestBoth.me.rank}).</p>
       <div class="wi-actions">
-        <button type="button" class="btn btn-ghost" data-wibest="all">✨ Best lineup every week</button>
-        ${edited ? '<button type="button" class="btn btn-ghost" data-wireset="all">Reset all</button>' : ''}
+        <button type="button" class="btn btn-ghost" data-wibest="all">✨ My best lineup every week</button>
+        <button type="button" class="btn btn-ghost" data-wieveryone="1">🏆 Everyone’s best lineup</button>
+        ${edited || othersBest ? '<button type="button" class="btn btn-ghost" data-wireset="all">Reset all</button>' : ''}
       </div>
     </section>`;
 
@@ -5152,8 +5188,8 @@ function renderWhatIf(vm) {
         </div>
       </header>
       <div class="wi-score">
-        <div><span>Real</span><strong>${f1(x.real.my)}</strong>${x.op != null ? `<em>vs ${f1(x.op)}</em>` : ''}${resTag(x.real.res)}</div>
-        <div class="alt"><span>What if</span><strong data-lk="wi:w${w}">${f1(x.my)}</strong>${x.op != null ? `<em>vs ${f1(x.op)}</em>` : ''}${resTag(x.res)}</div>
+        <div><span>Real</span><strong>${f1(x.real.my)}</strong>${x.real.op != null ? `<em>vs ${f1(x.real.op)}</em>` : ''}${resTag(x.real.res)}</div>
+        <div class="alt"><span>What if</span><strong data-lk="wi:w${w}">${f1(x.my)}</strong>${x.op != null ? `<em>vs ${f1(x.op)}${othersBest && x.op !== x.real.op ? ' (their best)' : ''}</em>` : ''}${resTag(x.res)}</div>
       </div>
       ${W.medianGame && x.med != null ? `<p class="wi-med">Median game: ${f1(x.med)} pts → real ${x.real.medRes}, what if ${x.medRes}</p>` : ''}
       <p class="wi-hint">Tap a spot to swap in someone from your bench.</p>
@@ -5177,7 +5213,7 @@ function renderWhatIf(vm) {
   }).join('');
   const table = `
     <section class="card wi-table">
-      <header class="wi-th"><h3>What-if standings</h3><p>${edited ? 'Your changes also flip your opponents’ results.' : 'Same as the real table until you change a week.'}${po ? ` Top ${po} make the playoffs.` : ''}</p></header>
+      <header class="wi-th"><h3>What-if standings</h3><p>${othersBest ? 'Every other team plays its best possible lineup each week' + (edited ? ', and your changes are applied.' : '; yours stay as you played them.') : edited ? 'Your changes also flip your opponents’ results.' : 'Same as the real table until you change a week.'}${po ? ` Top ${po} make the playoffs.` : ''}</p></header>
       <div class="wi-row head"><span class="wi-rk">#</span><span class="wi-mv"></span><span></span><span class="wi-tn">Team</span><span class="wi-rec">Record</span><span class="wi-pf hide-sm">PF</span></div>
       ${rows}
     </section>`;
@@ -7618,7 +7654,21 @@ $('main').addEventListener('click', e => {
     return;
   }
   const wir = e.target.closest('[data-wireset]');
-  if (wir && ui.vm) { wiApply(st => { if (wir.dataset.wireset === 'all') st.edits = {}; else delete st.edits[Number(wir.dataset.wireset)]; st.sel = null; }); return; }
+  if (wir && ui.vm) { wiApply(st => { if (wir.dataset.wireset === 'all') { st.edits = {}; st.others = 'real'; } else delete st.edits[Number(wir.dataset.wireset)]; st.sel = null; }); return; }
+  const wio = e.target.closest('[data-wiothers]');
+  if (wio && ui.vm) { wiApply(st => { st.others = wio.dataset.wiothers; }); return; }
+  if (e.target.closest('[data-wieveryone]') && ui.vm) {
+    const W = ui.vm.whatIf;
+    wiApply(st => {
+      st.others = 'best';
+      for (const w of W.weeks) {
+        const wk = W.week(w), best = W.best(wk);
+        if (best.every((id, k) => (id || null) === (wk.starters[k] || null))) delete st.edits[w]; else st.edits[w] = best;
+      }
+      st.sel = null;
+    });
+    return;
+  }
   const rkm = e.target.closest('[data-rankmode]');
   if (rkm && ui.vm) { ui.rankMode = rkm.dataset.rankmode; renderLeague(ui.vm); return; }
   const pmm = e.target.closest('[data-pmmetric]');
