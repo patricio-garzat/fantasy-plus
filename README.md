@@ -2,7 +2,7 @@
 
 Analyze your Sleeper fantasy football league: live scores and standings, NFL scores, waiver and trade ideas, start/sit, player stats and more.
 
-**Open it:** https://patricio-garzat.github.io/fantasy-plus/
+**Open it:** https://fantasyplus.netlify.app
 
 Paste your Sleeper league link and pick your team. Read-only — nothing is changed in your league.
 
